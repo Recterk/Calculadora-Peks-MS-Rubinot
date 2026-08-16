@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Perks — Grand Sanguine Coil &amp; Stellar Moonsilver Channeler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0F141A; --slab:#161E26; --slab2:#1C262F; --line:#2A3742;
+  --sanguine:#B0323C; --sanguine-dim:#6E2028;
+  --moonsilver:#A8C4DA; --moonsilver-dim:#5A7286;
+  --bone:#E8E0D0; --ash:#8695A2; --gild:#D2A24C;
+  --ok:#6FA88B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--void); color:var(--bone);
+  font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 18px 80px}
+
+/* ---- header ---- */
+header{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash)}
+h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(24px,4.6vw,40px);line-height:1.1;margin:10px 0 8px;letter-spacing:.01em}
+h1 .amp{color:var(--sanguine)}
+.sub{color:var(--ash);max-width:62ch;font-size:14px;margin:0}
+
+.layout{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* ---- panels ---- */
+.panel{background:var(--slab);border:1px solid var(--line);border-radius:3px;padding:18px}
+.panel + .panel{margin-top:16px}
+aside{position:sticky;top:20px}
+@media(max-width:900px){aside{position:static}}
+.panel h2{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);margin:0 0 14px;font-weight:600}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--ash);margin-bottom:4px}
+input[type=number],select{
+  width:100%;background:var(--void);border:1px solid var(--line);color:var(--bone);
+  font-family:'IBM Plex Mono',monospace;font-size:14px;padding:8px 9px;border-radius:2px;
+}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gild);outline-offset:1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+.rot-row{display:grid;grid-template-columns:1fr 66px;gap:8px;align-items:center;margin-bottom:6px}
+.rot-row span{font-size:13px}
+.rot-row em{font-style:normal;color:var(--ash);font-size:11px;font-family:'IBM Plex Mono',monospace}
+.sum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ash);margin-top:8px;display:flex;justify-content:space-between}
+.sum.bad{color:var(--sanguine)}
+
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid var(--line);color:var(--ash)}
+.badge.verified{color:var(--ok);border-color:#2E4A3E}
+.badge.unverified{color:var(--gild);border-color:#4A3D22}
+.warn{background:#241C10;border:1px solid #4A3D22;color:#E0CFA6;font-size:12px;padding:9px 10px;border-radius:2px;margin-top:10px;line-height:1.45}
+
+/* ---- weapon tabs ---- */
+.tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:18px}
+.tabs button{
+  flex:1;background:var(--slab);border:0;color:var(--ash);cursor:pointer;
+  font-family:'Cinzel',serif;font-weight:500;font-size:13px;padding:12px 8px;letter-spacing:.04em;
+}
+.tabs button[aria-selected=true]{background:var(--slab2);color:var(--bone);box-shadow:inset 0 -2px 0 var(--sanguine)}
+.tabs button:nth-child(2)[aria-selected=true]{box-shadow:inset 0 -2px 0 var(--moonsilver)}
+
+/* ---- summary ---- */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;margin-bottom:20px}
+@media(max-width:640px){.summary{grid-template-columns:1fr 1fr}}
+.stat{background:var(--slab);padding:13px 14px}
+.stat .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash)}
+.stat .v{font-family:'IBM Plex Mono',monospace;font-size:20px;margin-top:3px}
+.stat .v.gain{color:var(--ok)}
+
+/* ---- the ladder (signature) ---- */
+.ladder{border-left:1px solid var(--line);margin-left:19px;padding-left:0}
+.rung{position:relative;padding:0 0 4px 30px;margin-bottom:16px}
+.rung::before{
+  content:attr(data-n);position:absolute;left:-19px;top:0;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-weight:700;font-size:13px;
+  background:var(--void);border:1px solid var(--line);border-radius:50%;color:var(--ash);
+}
+.rung.shape::before{border-color:var(--sanguine);color:var(--sanguine);border-style:dashed}
+.rung .head{display:flex;align-items:center;gap:10px;min-height:38px;flex-wrap:wrap}
+.rung .head h3{font-size:13px;margin:0;font-weight:600;letter-spacing:.02em}
+.opts{margin-top:8px;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.opt{display:grid;grid-template-columns:1fr 78px;gap:10px;align-items:center;padding:9px 12px;background:var(--slab);border-top:1px solid var(--line);font-size:13.5px}
+.opt:first-child{border-top:0}
+.opt.best{background:var(--slab2)}
+.opt.best .name::before{content:"▸ ";color:var(--gild)}
+.opt.best .val{color:var(--gild)}
+.opt .val{font-family:'IBM Plex Mono',monospace;text-align:right;font-size:13px;color:var(--ash)}
+.opt .name small{display:block;color:var(--ash);font-size:11.5px;margin-top:1px}
+.opt.dead .name{color:var(--ash)}
+
+.shape-box{margin-top:8px;border:1px dashed var(--sanguine-dim);background:#1A1114;border-radius:3px;padding:12px}
+.shape-box .lead{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sanguine);margin-bottom:8px}
+.shape-box .lost{font-size:12px;color:var(--ash);margin-top:8px}
+.pool{display:grid;grid-template-columns:1fr 78px;gap:10px;font-size:13.5px;padding:4px 0}
+.pool .val{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--ash);font-size:13px}
+.pool.top .val{color:var(--ok)}
+.pool.top .name::before{content:"▸ ";color:var(--ok)}
+
+footer{margin-top:34px;border-top:1px solid var(--line);padding-top:18px;color:var(--ash);font-size:12px;line-height:1.6}
+footer b{color:var(--bone);font-weight:600}
+details summary{cursor:pointer;color:var(--ash);font-size:12px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+details[open] summary{margin-bottom:10px}
+code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver)}
+@media(prefers-reduced-motion:no-preference){.opt{transition:background .12s ease}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Sorcerer · Weapon Proficiency</div>
+  <h1>Grand Sanguine Coil <span class="amp">&amp;</span><br>Stellar Moonsilver Channeler</h1>
+  <p class="sub">Calcula o ganho médio de dano de cada perk da árvore com os seus números, aponta o melhor de cada nível e indica quais dois slots moldar.</p>
+</header>
+
+<div class="layout">
+
+<aside>
+  <div class="panel">
+    <h2>Personagem</h2>
+    <div class="grid2">
+      <div class="field"><label for="level">Level</label><input type="number" id="level" value="1846" min="1"></div>
+      <div class="field"><label for="ml">Magic Level (total)</label><input type="number" id="ml" value="157" min="1"></div>
+      <div class="field"><label for="crit">Crit chance %</label><input type="number" id="crit" value="20" step="0.5" min="0"></div>
+      <div class="field"><label for="cdmg">Crit extra damage %</label><input type="number" id="cdmg" value="60" step="1" min="0"></div>
+      <div class="field"><label for="targets">Alvos por cast</label><input type="number" id="targets" value="4" min="1"></div>
+      <div class="field"><label for="bclass">Bestiário: % da spawn</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Hunt</h2>
+    <div class="field"><label for="region">Região</label><select id="region"></select></div>
+    <div class="field"><label for="hunt">Hunt</label><select id="hunt"></select></div>
+    <div id="huntmeta"></div>
+    <div class="field" style="margin-top:14px"><label>Sensibilidade do bicho (%)</label>
+      <div class="grid3">
+        <div><input type="number" id="sFire" value="110" step="1"><label style="text-align:center;margin-top:3px">fire</label></div>
+        <div><input type="number" id="sEnergy" value="90" step="1"><label style="text-align:center;margin-top:3px">energy</label></div>
+        <div><input type="number" id="sDeath" value="90" step="1"><label style="text-align:center;margin-top:3px">death</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Rotação — % do dano</h2>
+    <div id="rot"></div>
+    <div class="sum" id="rotsum"><span>Soma</span><span id="rotval">100%</span></div>
+  </div>
+</aside>
+
+<main>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-coil" aria-selected="true">Grand Sanguine Coil</button>
+    <button role="tab" id="tab-stellar" aria-selected="false">Stellar Moonsilver Channeler</button>
+  </div>
+
+  <div class="summary">
+    <div class="stat"><div class="k">Parcela de ML (w)</div><div class="v" id="oW">—</div></div>
+    <div class="stat"><div class="k">Dano-base do level</div><div class="v" id="oB">—</div></div>
+    <div class="stat"><div class="k">Perk de skill (rank 10)</div><div class="v" id="oSkill">—</div></div>
+    <div class="stat"><div class="k">Ganho das 2 trocas</div><div class="v gain" id="oNet">—</div></div>
+  </div>
+
+  <div class="ladder" id="ladder"></div>
+
+  <footer>
+    <details>
+      <summary>Como as contas são feitas</summary>
+      <p><b>Dano médio</b> = D × (1 + p·E). <b>w</b> = mult·ML / (mult·ML + B), onde B é o dano-base que vem do level (+1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500) e mult é o multiplicador médio de ML da sua rotação.</p>
+      <p><code>crit extra +y%</code> = fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w &nbsp;·&nbsp; <code>dano base +z%</code> = z · fatia da magia.</p>
+      <p><b>Pierce</b> soma pontos na sensibilidade do alvo, e o ganho é ΔS/S. O acréscimo cai pela metade acima de 100% e nunca sobe sensibilidade 0%. Por isso ele rende menos justamente contra bicho fraco ao seu elemento.</p>
+      <p><b>Multiplicadores de ML</b> — Hell's Core 10,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki. Great Fire Wave, Death Echo e Great Death Beam são posteriores ao rebalanceamento e estão <b>estimados</b>.</p>
+      <p><b>Rubinot é OT.</b> Fórmulas de dano, crit e a implementação da proficiência podem divergir do global. Confirme na Cyclopedia e no Bestiary antes de gastar dust.</p>
+    </details>
+  </footer>
+</main>
+</div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- dados ---------------- */
+
+const SPELLS = {
+  hellscore:   {label:"Hell's Core",        el:"fire",   mult:10.5, src:true},
+  gfw:         {label:"Great Fire Wave",    el:"fire",   mult:9.0,  src:false},
+  energywave:  {label:"Energy Wave",        el:"energy", mult:6.75, src:true},
+  energybeam:  {label:"Great Energy Beam",  el:"energy", mult:5.5,  src:true},
+  deathecho:   {label:"Death Echo",         el:"death",  mult:8.0,  src:false},
+  deathbeam:   {label:"Great Death Beam",   el:"death",  mult:5.5,  src:false},
+  sd:          {label:"Sudden Death (runa)",el:"death",  mult:6.0,  src:true}
+};
+
+// sens: sensibilidade em % (100 = neutro, >100 = fraco, <100 = resistente)
+// verified: a lista "sensitive to" da área está documentada; os VALORES continuam sendo estimativa.
+const REGIONS = {
+  "Rotten Blood":{
+    "Putrefactory":   {sens:{fire:110,energy:90,death:90},  verified:true, note:"Sensível a Holy, Earth e Fire. Cospe Death/Ice/Energy.",
+                       rot:{hellscore:50,gfw:50}},
+    "Darklight Core": {sens:{fire:110,energy:90,death:100}, verified:true, note:"Sensível a Earth, Fire e Physical. Cospe Energy/Physical/Ice.",
+                       rot:{hellscore:45,gfw:40,deathecho:15}},
+    "Gloom Pillars":  {sens:{fire:90,energy:110,death:110}, verified:true, note:"Sensível a Physical, Death e Energy. Cospe Holy/Fire/Earth.",
+                       rot:{deathecho:35,deathbeam:30,energywave:35}},
+    "Jaded Roots":    {sens:{fire:90,energy:110,death:100}, verified:true, note:"Sensível a Energy, Ice e Holy. Cospe Earth/Physical/Fire.",
+                       rot:{energywave:55,energybeam:45}}
+  },
+  "Soul War":{
+    "Claustrophobic Inferno":{sens:{fire:100,energy:100,death:100}, verified:false},
+    "Mirrored Nightmare":    {sens:{fire:100,energy:100,death:100}, verified:false},
+    "Ebb and Flow":          {sens:{fire:100,energy:100,death:100}, verified:false},
+    "Furious Crater":        {sens:{fire:100,energy:100,death:100}, verified:false},
+    "Rotten Wasteland":      {sens:{fire:100,energy:100,death:100}, verified:false}
+  },
+  "Gnomprona":{
+    "Monster Graveyard":{sens:{fire:100,energy:100,death:100}, verified:false},
+    "Crystal Enigma":   {sens:{fire:100,energy:100,death:100}, verified:false},
+    "Sparkling Pools":  {sens:{fire:100,energy:100,death:100}, verified:false}
+  },
+  "Crypt":{
+    "The Outer Crypt":     {sens:{fire:100,energy:100,death:100}, verified:false},
+    "The Forsaken Crypt":  {sens:{fire:100,energy:100,death:100}, verified:false},
+    "The Unhallowed Crypt":{sens:{fire:100,energy:100,death:100}, verified:false}
+  }
+};
+
+const DEFAULT_ROT = {hellscore:35,gfw:25,deathecho:20,deathbeam:20};
+
+/* árvores — cada opção vira um valor calculado */
+const TREES = {
+  coil:{
+    name:"Grand Sanguine Coil",
+    levels:[
+      [{t:"ml",n:1,label:"+1 Magic Level"}],
+      [{t:"critExtra",y:10,el:"energy",label:"+10% crit extra damage — Energy"},
+       {t:"critExtra",y:10,el:"fire",label:"+10% crit extra damage — Fire"},
+       {t:"critExtra",y:7,label:"+7% crit extra damage"}],
+      [{t:"base",z:8,sp:"energywave",label:"+8% dano base — Energy Wave"},
+       {t:"critExtra",y:25,sp:"hellscore",label:"+25% crit extra damage — Hell's Core"},
+       {t:"boss",v:3,label:"+3% dano contra bosses e Sinister Embraced"}],
+      [{t:"skill",x:8,label:"+8% do Magic Level como dano extra nas spells"},
+       {t:"base",z:6,sp:"hellscore",label:"+6% dano base — Hell's Core"}],
+      [{t:"ml",n:2,el:"energy",label:"+2 Energy Magic Level"},
+       {t:"ml",n:2,el:"fire",label:"+2 Fire Magic Level"}],
+      [{t:"critChance",x:2,el:"energy",label:"+2% crit chance — Energy"},
+       {t:"critChance",x:2,el:"fire",label:"+2% crit chance — Fire"},
+       {t:"critExtra",y:10,label:"+10% crit extra damage"}],
+      [{t:"critChance",x:3,label:"+3% crit hit chance"}]
+    ]
+  },
+  stellar:{
+    name:"Stellar Moonsilver Channeler",
+    levels:[
+      [{t:"critExtra",y:12,label:"+12% crit extra damage"}],
+      [{t:"bestiary",v:3,label:"+3% dano contra Human"},
+       {t:"ml",n:1,label:"+1 Magic Level"},
+       {t:"critExtra",y:6,label:"+6% crit extra damage"}],
+      [{t:"base",z:7.5,sp:"gfw",label:"+7,5% dano base — Great Fire Wave"},
+       {t:"homing",label:"1% de chance de homing missile de Death (300% do level)"},
+       {t:"base",z:7.5,sp:"deathecho",label:"+7,5% dano base — Death Echo"}],
+      [{t:"critExtra",y:12.5,el:"fire",label:"+12,5% crit extra damage — Fire"},
+       {t:"ml",n:2,label:"+2 Magic Level"},
+       {t:"critExtra",y:12.5,el:"death",label:"+12,5% crit extra damage — Death"}],
+      [{t:"critChance",x:2.5,sp:"gfw",label:"+2,5% crit chance — Great Fire Wave"},
+       {t:"critChance",x:2.5,sp:"sd",label:"+2,5% crit chance — Sudden Death"},
+       {t:"critChance",x:2.5,sp:"deathecho",label:"+2,5% crit chance — Death Echo"}],
+      [{t:"pierce",v:4,el:"fire",label:"+4% Fire pierce"},
+       {t:"critExtra",y:12,label:"+12% crit extra damage"},
+       {t:"pierce",v:4,el:"death",label:"+4% Death pierce"}],
+      [{t:"omega",v:9,label:"+9% dano contra alvos abaixo de 30% de vida"}]
+    ]
+  }
+};
+
+/* ---------------- motor ---------------- */
+
+function baseFromLevel(L){
+  const bands=[[1,500,5],[501,1100,6],[1101,1800,7],[1801,2600,8],[2601,3500,9],[3501,4500,10],[4501,5600,11]];
+  let B=0;
+  for(const [a,b,s] of bands){
+    if(L>=b) B+=Math.floor((b-a+1)/s);
+    else if(L>=a){ B+=Math.floor((L-a+1)/s); break; }
+  }
+  return B;
+}
+
+function readState(){
+  const num=id=>parseFloat(document.getElementById(id).value)||0;
+  const rot={}; let tot=0;
+  for(const k in SPELLS){ rot[k]=num("rot_"+k); tot+=rot[k]; }
+  const share={}; for(const k in SPELLS) share[k]= tot>0 ? rot[k]/tot : 0;
+
+  const el={fire:0,energy:0,death:0};
+  for(const k in SPELLS) el[SPELLS[k].el]+=share[k];
+
+  let mult=0; for(const k in SPELLS) mult+=share[k]*SPELLS[k].mult;
+  if(mult<=0) mult=10.5;
+
+  const ml=Math.max(num("ml"),1), L=Math.max(num("level"),1);
+  const B=baseFromLevel(L);
+  return {
+    L, ml, B, mult, share, el,
+    w:(mult*ml)/(mult*ml+B),
+    p:num("crit")/100, E:num("cdmg")/100,
+    targets:Math.max(num("targets"),1),
+    bclass:num("bclass")/100,
+    sens:{fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)},
+    rotTotal:tot
+  };
+}
+
+// retorna ganho médio em % do dano total
+function value(o,S){
+  const den=1+S.p*S.E;
+  const frac=o.el?S.el[o.el]:(o.sp?S.share[o.sp]:1);
+  switch(o.t){
+    case "ml":      return o.n*S.w/S.ml*100*(o.el?S.el[o.el]:1);
+    case "skill":   return o.x*S.w;
+    case "critExtra":  return frac*S.p*o.y/den;
+    case "critChance": return frac*(o.x/100)*S.E/den*100;
+    case "base":    return o.z*frac;
+    case "bestiary":return o.v*S.bclass;
+    case "omega":   return o.v*0.30;
+    case "alpha":   return o.v*0.05;
+    case "boss":    return 0;
+    case "pierce":{
+      const Sv=S.sens[o.el];
+      if(Sv<=0) return 0;
+      const add=Sv>100?o.v/2:o.v;
+      return S.el[o.el]*(add/Sv)*100;
+    }
+    case "homing":{
+      const hit=S.mult*S.ml+S.B;
+      return 0.01*3*S.L/(hit*S.targets)*100;
+    }
+    default: return 0;
+  }
+}
+
+function poolOptions(S){
+  const main=Object.keys(SPELLS).reduce((a,b)=>S.share[a]>=S.share[b]?a:b);
+  const den=1+S.p*S.E;
+  return [
+    {label:"+8% da maior skill de combate como dano extra nas magias", v:8*S.w, note:"neutro, pega toda a rotação"},
+    {label:"+20% crit extra damage — "+SPELLS[main].label, v:S.share[main]*S.p*20/den, note:"só na magia principal"},
+    {label:"+2,5% de dano contra a classe do bestiário", v:2.5*S.bclass, note:"só na fatia da spawn dessa classe"},
+    {label:"+3% dano base — "+SPELLS[main].label, v:3*S.share[main], note:"só na magia principal"},
+    {label:"+2,5% de dano contra alvos abaixo de 30% de vida", v:2.5*0.30, note:"média ao longo da kill"},
+    {label:"+10% de dano contra alvos acima de 95% de vida", v:10*0.05, note:"média ao longo da kill"}
+  ].sort((a,b)=>b.v-a.v);
+}
+
+/* ---------------- render ---------------- */
+
+let currentTree="coil";
+const fmt=v=>(v>=0?"+":"")+v.toFixed(2)+"%";
+
+function render(){
+  const S=readState();
+  const tree=TREES[currentTree];
+  const pool=poolOptions(S);
+  const best=pool[0];
+
+  // melhor opção de cada nível
+  const per=tree.levels.map((opts,i)=>{
+    const vals=opts.map(o=>({o,v:value(o,S)}));
+    const top=vals.reduce((a,b)=>b.v>a.v?b:a);
+    return {i,vals,top};
+  });
+
+  // dois níveis mais baratos = alvos de troca
+  const order=[...per].sort((a,b)=>a.top.v-b.top.v);
+  const shape=new Set([order[0].i,order[1].i]);
+  const lost=order[0].top.v+order[1].top.v;
+  const net=2*best.v-lost;
+
+  document.getElementById("oW").textContent=S.w.toFixed(3);
+  document.getElementById("oB").textContent=S.B;
+  document.getElementById("oSkill").textContent=fmt(8*S.w);
+  document.getElementById("oNet").textContent=fmt(net);
+
+  const lad=document.getElementById("ladder");
+  lad.innerHTML=per.map(({i,vals,top})=>{
+    const isShape=shape.has(i);
+    const rows=vals.map(({o,v})=>{
+      const dead=o.t==="boss";
+      return `<div class="opt ${(!isShape&&o===top.o)?"best":""} ${dead?"dead":""}">
+        <div class="name">${o.label}${dead?"<small>situacional — vale 0 fora de boss</small>":""}</div>
+        <div class="val">${fmt(v)}</div></div>`;
+    }).join("");
+
+    const shapeBox=isShape?`<div class="shape-box">
+        <div class="lead">Trocar este slot</div>
+        ${pool.slice(0,3).map((q,k)=>`<div class="pool ${k===0?"top":""}">
+            <div class="name">${q.label}<small style="display:block;color:var(--ash);font-size:11.5px">${q.note}</small></div>
+            <div class="val">${fmt(q.v)}</div></div>`).join("")}
+        <div class="lost">Você abre mão de ${fmt(top.v)} para ganhar ${fmt(best.v)} — saldo ${fmt(best.v-top.v)}.</div>
+      </div>`:"";
+
+    return `<div class="rung ${isShape?"shape":""}" data-n="N${i+1}">
+      <div class="head"><h3>${isShape?"Slot moldado":"Usar a melhor opção"}</h3>
+        ${isShape?'<span class="badge" style="color:var(--sanguine);border-color:var(--sanguine-dim)">troca</span>':""}
+        ${vals.length===1&&!isShape?'<span class="badge">nível fixo</span>':""}</div>
+      <div class="opts" ${isShape?'style="opacity:.45"':""}>${rows}</div>
+      ${shapeBox}
+    </div>`;
+  }).join("");
+}
+
+/* ---------------- UI ---------------- */
+
+function buildRotation(){
+  document.getElementById("rot").innerHTML=Object.entries(SPELLS).map(([k,s])=>
+    `<div class="rot-row"><span>${s.label} <em>${s.el}${s.src?"":" ~"}</em></span>
+     <input type="number" id="rot_${k}" min="0" value="${DEFAULT_ROT[k]||0}"></div>`).join("");
+}
+
+function applyHunt(){
+  const r=document.getElementById("region").value;
+  const h=document.getElementById("hunt").value;
+  const d=REGIONS[r][h]; if(!d) return;
+  document.getElementById("sFire").value=d.sens.fire;
+  document.getElementById("sEnergy").value=d.sens.energy;
+  document.getElementById("sDeath").value=d.sens.death;
+  for(const k in SPELLS) document.getElementById("rot_"+k).value=(d.rot&&d.rot[k])||0;
+  if(!d.rot) for(const k in DEFAULT_ROT) document.getElementById("rot_"+k).value=DEFAULT_ROT[k];
+
+  document.getElementById("huntmeta").innerHTML = d.verified
+    ? `<span class="badge verified">área documentada</span>
+       <div class="warn" style="background:#121A16;border-color:#2E4A3E;color:#BFD8CB">${d.note}<br>Os <b>valores</b> de sensibilidade são estimativa (fraco = 110). Ajuste pelo Bestiary.</div>`
+    : `<span class="badge unverified">não verificado</span>
+       <div class="warn">Não confirmei as resistências desta área. Os campos abaixo estão em 100% (neutro) — <b>abra o Bestiary de cada criatura e digite os valores reais</b>, senão a conta trata todos os elementos como iguais.</div>`;
+  render();
+}
+
+function buildHunts(){
+  const rs=document.getElementById("region");
+  rs.innerHTML=Object.keys(REGIONS).map(r=>`<option>${r}</option>`).join("");
+  const fill=()=>{
+    const r=rs.value;
+    document.getElementById("hunt").innerHTML=Object.keys(REGIONS[r]).map(h=>`<option>${h}</option>`).join("");
+    applyHunt();
+  };
+  rs.addEventListener("change",fill);
+  document.getElementById("hunt").addEventListener("change",applyHunt);
+  fill();
+}
+
+function rotSum(){
+  let t=0; for(const k in SPELLS) t+=parseFloat(document.getElementById("rot_"+k).value)||0;
+  const el=document.getElementById("rotval");
+  el.textContent=t.toFixed(0)+"%";
+  document.getElementById("rotsum").classList.toggle("bad",Math.abs(t-100)>0.5);
+}
+
+function init(){
+  buildRotation();
+  buildHunts();
+  document.addEventListener("input",e=>{
+    if(e.target.tagName==="INPUT"){ rotSum(); render(); }
+  });
+  document.getElementById("tab-coil").addEventListener("click",()=>switchTab("coil"));
+  document.getElementById("tab-stellar").addEventListener("click",()=>switchTab("stellar"));
+  rotSum(); render();
+}
+
+function switchTab(t){
+  currentTree=t;
+  document.getElementById("tab-coil").setAttribute("aria-selected",t==="coil");
+  document.getElementById("tab-stellar").setAttribute("aria-selected",t==="stellar");
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
