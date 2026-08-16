@@ -51,9 +51,12 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
-.rot-row{display:grid;grid-template-columns:1fr 66px;gap:8px;align-items:center;margin-bottom:6px}
+.rot-head{display:grid;grid-template-columns:1fr 58px 50px;gap:8px;margin-bottom:6px}
+.rot-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash);text-align:center}
+.rot-row{display:grid;grid-template-columns:1fr 58px 50px;gap:8px;align-items:center;margin-bottom:6px}
 .rot-row span{font-size:13px}
 .rot-row em{font-style:normal;color:var(--ash);font-size:11px;font-family:'IBM Plex Mono',monospace}
+.rot-row input{padding:7px 6px;text-align:center}
 .sum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ash);margin-top:8px;display:flex;justify-content:space-between}
 .sum.bad{color:var(--sanguine)}
 
@@ -136,9 +139,8 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       <div class="field"><label for="ml">Magic Level (total)</label><input type="number" id="ml" value="157" min="1"></div>
       <div class="field"><label for="crit">Crit chance %</label><input type="number" id="crit" value="20" step="0.5" min="0"></div>
       <div class="field"><label for="cdmg">Crit extra damage %</label><input type="number" id="cdmg" value="60" step="1" min="0"></div>
-      <div class="field"><label for="targets">Alvos por cast</label><input type="number" id="targets" value="4" min="1"></div>
-      <div class="field"><label for="bclass">Bestiário: % da spawn</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
     </div>
+    <div class="field"><label for="bclass">Bestiário: % da spawn na classe</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
   </div>
 
   <div class="panel">
@@ -156,9 +158,15 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
   </div>
 
   <div class="panel">
-    <h2>Rotação — % do dano</h2>
+    <h2>Rotação</h2>
+    <div class="rot-head"><span></span><span>% dano</span><span>alvos</span></div>
     <div id="rot"></div>
     <div class="sum" id="rotsum"><span>Soma</span><span id="rotval">100%</span></div>
+    <div class="field" style="margin-top:14px"><label for="procmode">Homing missile do N3 dispara</label>
+      <select id="procmode">
+        <option value="cast">1% por cast</option>
+        <option value="target">1% por alvo atingido</option>
+      </select></div>
   </div>
 </aside>
 
@@ -183,7 +191,8 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       <p><b>Dano médio</b> = D × (1 + p·E). <b>w</b> = mult·ML / (mult·ML + B), onde B é o dano-base que vem do level (+1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500) e mult é o multiplicador médio de ML da sua rotação.</p>
       <p><code>crit extra +y%</code> = fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w &nbsp;·&nbsp; <code>dano base +z%</code> = z · fatia da magia.</p>
       <p><b>Pierce</b> soma pontos na sensibilidade do alvo, e o ganho é ΔS/S. O acréscimo cai pela metade acima de 100% e nunca sobe sensibilidade 0%. Por isso ele rende menos justamente contra bicho fraco ao seu elemento.</p>
-      <p><b>Multiplicadores de ML</b> — Hell's Core 10,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki. Great Fire Wave, Death Echo e Great Death Beam são posteriores ao rebalanceamento e estão <b>estimados</b>.</p>
+      <p><b>Alvos por cast</b> só entram na conta do homing missile (N3 da Channeler), porque todos os outros perks são multiplicativos e o tamanho do pull se cancela. Se o proc for por cast, o ganho é 0,03·Level · Σ(fatia da magia ÷ dano por cast dela) — magia que pega muito alvo dilui o proc. Se for por alvo atingido, o tamanho do pull deixa de importar. Não sei qual das duas o jogo usa, por isso o seletor.</p>
+      <p><b>Multiplicadores de ML</b> — Hell's Core 10,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki. Great Fire Wave, Death Echo e Great Death Beam são posteriores ao rebalanceamento e estão <b>estimados</b> (marcados com ~).</p>
       <p><b>Rubinot é OT.</b> Fórmulas de dano, crit e a implementação da proficiência podem divergir do global. Confirme na Cyclopedia e no Bestiary antes de gastar dust.</p>
     </details>
   </footer>
@@ -197,13 +206,13 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
 /* ---------------- dados ---------------- */
 
 const SPELLS = {
-  hellscore:   {label:"Hell's Core",        el:"fire",   mult:10.5, src:true},
-  gfw:         {label:"Great Fire Wave",    el:"fire",   mult:9.0,  src:false},
-  energywave:  {label:"Energy Wave",        el:"energy", mult:6.75, src:true},
-  energybeam:  {label:"Great Energy Beam",  el:"energy", mult:5.5,  src:true},
-  deathecho:   {label:"Death Echo",         el:"death",  mult:8.0,  src:false},
-  deathbeam:   {label:"Great Death Beam",   el:"death",  mult:5.5,  src:false},
-  sd:          {label:"Sudden Death (runa)",el:"death",  mult:6.0,  src:true}
+  hellscore:   {label:"Hell's Core",        el:"fire",   mult:10.5, src:true,  tg:6},
+  gfw:         {label:"Great Fire Wave",    el:"fire",   mult:9.0,  src:false, tg:4},
+  energywave:  {label:"Energy Wave",        el:"energy", mult:6.75, src:true,  tg:4},
+  energybeam:  {label:"Great Energy Beam",  el:"energy", mult:5.5,  src:true,  tg:3},
+  deathecho:   {label:"Death Echo",         el:"death",  mult:8.0,  src:false, tg:5},
+  deathbeam:   {label:"Great Death Beam",   el:"death",  mult:5.5,  src:false, tg:3},
+  sd:          {label:"Sudden Death (runa)",el:"death",  mult:6.0,  src:true,  tg:1}
 };
 
 // sens: sensibilidade em % (100 = neutro, >100 = fraco, <100 = resistente)
@@ -300,8 +309,8 @@ function baseFromLevel(L){
 
 function readState(){
   const num=id=>parseFloat(document.getElementById(id).value)||0;
-  const rot={}; let tot=0;
-  for(const k in SPELLS){ rot[k]=num("rot_"+k); tot+=rot[k]; }
+  const rot={}, tg={}; let tot=0;
+  for(const k in SPELLS){ rot[k]=num("rot_"+k); tg[k]=Math.max(num("tg_"+k),1); tot+=rot[k]; }
   const share={}; for(const k in SPELLS) share[k]= tot>0 ? rot[k]/tot : 0;
 
   const el={fire:0,energy:0,death:0};
@@ -313,10 +322,10 @@ function readState(){
   const ml=Math.max(num("ml"),1), L=Math.max(num("level"),1);
   const B=baseFromLevel(L);
   return {
-    L, ml, B, mult, share, el,
+    L, ml, B, mult, share, el, tg,
+    procmode:document.getElementById("procmode").value,
     w:(mult*ml)/(mult*ml+B),
     p:num("crit")/100, E:num("cdmg")/100,
-    targets:Math.max(num("targets"),1),
     bclass:num("bclass")/100,
     sens:{fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)},
     rotTotal:tot
@@ -344,8 +353,17 @@ function value(o,S){
       return S.el[o.el]*(add/Sv)*100;
     }
     case "homing":{
-      const hit=S.mult*S.ml+S.B;
-      return 0.01*3*S.L/(hit*S.targets)*100;
+      // procs por cast: gasta uma rolagem por cast, independente de quantos alvos pegou.
+      // procs por alvo: uma rolagem por alvo atingido, o que anula o efeito do tamanho do pull.
+      // ganho = 0,03·Level · Σ(fatia_i / dano_por_cast_i), com dano_por_cast_i = alvos_i · (mult_i·ML + B)
+      let acc=0;
+      for(const k in SPELLS){
+        if(!S.share[k]) continue;
+        const perTarget=SPELLS[k].mult*S.ml+S.B;
+        const perCast=perTarget*S.tg[k];
+        acc += S.share[k]/(S.procmode==="target"?perTarget:perCast);
+      }
+      return 0.01*3*S.L*acc*100;
     }
     default: return 0;
   }
@@ -426,7 +444,8 @@ function render(){
 function buildRotation(){
   document.getElementById("rot").innerHTML=Object.entries(SPELLS).map(([k,s])=>
     `<div class="rot-row"><span>${s.label} <em>${s.el}${s.src?"":" ~"}</em></span>
-     <input type="number" id="rot_${k}" min="0" value="${DEFAULT_ROT[k]||0}"></div>`).join("");
+     <input type="number" id="rot_${k}" min="0" value="${DEFAULT_ROT[k]||0}" aria-label="% de dano de ${s.label}">
+     <input type="number" id="tg_${k}" min="1" value="${s.tg}" aria-label="alvos por cast de ${s.label}"></div>`).join("");
 }
 
 function applyHunt(){
@@ -473,6 +492,7 @@ function init(){
   document.addEventListener("input",e=>{
     if(e.target.tagName==="INPUT"){ rotSum(); render(); }
   });
+  document.getElementById("procmode").addEventListener("change",render);
   document.getElementById("tab-coil").addEventListener("click",()=>switchTab("coil"));
   document.getElementById("tab-stellar").addEventListener("click",()=>switchTab("stellar"));
   rotSum(); render();
