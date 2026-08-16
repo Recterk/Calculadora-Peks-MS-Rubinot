@@ -67,10 +67,16 @@ button.x:hover{color:var(--sanguine)}
 .pb-status.ok{color:var(--ok)}
 .pb-status.err{color:var(--sanguine)}
 
-.gear-row{display:grid;grid-template-columns:140px 1fr 62px 62px 62px 30px;gap:7px;align-items:center;margin-bottom:7px}
+.gear-row{display:grid;grid-template-columns:1fr 60px 60px 92px 66px 60px 28px;gap:7px;align-items:center;margin-bottom:7px}
 @media(max-width:620px){.gear-row{grid-template-columns:1fr 1fr 1fr;gap:6px}}
 .gear-row input,.gear-row select{font-size:12.5px;padding:6px 7px}
 input[type=text]{width:100%;background:var(--void);border:1px solid var(--line);color:var(--bone);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 9px;border-radius:2px}
+.mob-row{display:grid;grid-template-columns:1fr 150px 110px 100px 28px;gap:7px;align-items:center;margin-bottom:6px}
+@media(max-width:620px){.mob-row{grid-template-columns:1fr 1fr;gap:6px}}
+.mob-row input,.mob-row select{font-size:12.5px;padding:6px 7px}
+.mob-row .k{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gild)}
+.mob-row .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ash)}
+.mob-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--ash)}
 .adv-row{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)}
 .adv-row:first-of-type{border-top:0}
 .adv-row .k{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gild)}
@@ -240,19 +246,26 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
     <h2>Equipamento</h2>
     <div class="gear-row" style="margin-bottom:8px">
       <span class="rot-head" style="font-size:10px;color:var(--ash)">SLOT</span>
-      <span class="rot-head" style="font-size:10px;color:var(--ash)">NOME</span>
       <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">TIER</span>
       <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">ML</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">ELEM</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">ML EL.</span>
       <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">IMB</span><span></span>
     </div>
     <div id="gear"></div>
     <button type="button" id="addgear" class="ghost">+ adicionar peça</button>
     <div class="sum"><span id="gearSum">—</span></div>
+    <h3 class="sec">Transcendence e Amplification</h3>
+    <div class="out" id="avatarOut" style="text-align:left;padding:9px 11px;line-height:1.6">—</div>
     <p class="hint" style="margin-bottom:0">O tier de <b>Legs</b> (Transcendence) e <b>Boots</b> (Amplification) fica registrado aqui, mas não entra na conta de dano: são procs com uptime que eu teria que chutar. Os <b>augments</b> das peças você lança na lista de gemas abaixo — augment é modificador de magia, então cai na mesma matemática. E não tenho catálogo dos itens: nome e valores são digitados.</p>
   </div>
 
   <div class="panel">
     <h2>Charms e imbuements para esta hunt</h2>
+    <div class="grid2">
+      <div class="field"><label for="mana">Mana máxima</label><input type="number" id="mana" value="0" min="0"></div>
+      <div class="field"><label for="chpct">% da vida do alvo que o charm elemental causa</label><input type="number" id="chpct" value="5" step="0.5" min="0"></div>
+    </div>
     <div id="advice"></div>
   </div>
 
@@ -296,6 +309,7 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       <p><b>ML total × ML da skill.</b> O perk da Coil diz "do seu Magic Level" e usa o total da barra, com equipamento e tudo. Já o perk moldável fala em "maior habilidade de combate", e aqui ele conta só ML treinado + loyalty — por isso o valor dele sai multiplicado por (ML treinado ÷ ML total). Quanto mais ML você tira de equipamento, pior fica esse perk em relação ao da árvore.</p>
       <p><b>Charms.</b> Charm de dano bate uma fatia da vida máxima do bicho no elemento do charm, então a escolha segue a fraqueza da criatura e não a sua rotação. A lista sai das fraquezas documentadas da área. Charm não recebe pierce.</p>
       <p><b>Imbuements.</b> A sugestão cruza os elementos que a área usa contra você com o padrão de mago (Void primeiro, depois proteção). É heurística a partir dos elementos da área, não uma tabela testada hunt a hunt.</p>
+      <p><b>Transcendence e Amplification.</b> A legs tenta ativar a cada 2s com a chance do tier dela, e as boots multiplicam esse valor pelo Amplification Impact. Em avatar, por 7s, <b>todo dano crita</b> — então o uptime vira crit chance: <code>p efetivo = p + u·(1−p)</code>, onde <code>u = 7 ÷ (2/chance + 7)</code>. Consequência que muda decisão: perks de <b>crit chance</b> passam a valer só (1−u) do que valiam, porque dentro do avatar eles não fazem nada; perks de <b>crit extra damage</b> mantêm o valor inteiro e ainda ganham, já que agora acontecem em mais hits. Os +10% de resistência do avatar são defesa e ficam fora da conta de dano.</p>
       <p><b>Equipamento.</b> Nome, tier, ML e slots são registro seu — não existe catálogo de itens embutido. Augments de item entram na lista de gemas, porque matematicamente são a mesma coisa: modificador de uma magia. Tier de Legs (Transcendence) e Boots (Amplification) fica anotado mas fora da conta, porque são procs cujo uptime eu teria que chutar.</p>
       <p><b>Fora da conta de propósito:</b> Focus Mastery e outros bônus que multiplicam o dano inteiro por igual. Eles mudam quanto você bate, mas não mudam qual perk é melhor — saem na divisão.</p>
       <p><b>Multiplicador de ML</b> (define o w, não confundir com base power): Hell's Core 10,5, Rage of the Skies 8,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki; Great Fire Wave, Death Echo e Great Death Beam são <b>estimados</b> (marcados com ~).</p>
@@ -332,9 +346,11 @@ const STANCE = {
 };
 
 const GEM_TYPES = {
-  base:    "base damage (magia)",
-  cdmg:    "crit extra damage (magia)",
-  cchance: "crit hit chance (magia)"
+  base:     "base damage (magia)",
+  cdmg:     "critical extra damage (magia)",
+  cchance:  "critical extra chance (magia)",
+  gcdmg:    "critical extra damage (geral)",
+  gcchance: "critical extra chance (geral)"
 };
 
 // charm ofensivo por elemento e imbuement de proteção por elemento
@@ -343,10 +359,27 @@ const CHARM = {holy:"Divine Wrath", earth:"Poison", fire:"Enflame", energy:"Zap"
 const PROT  = {death:"Lich Shroud", earth:"Snake Skin", fire:"Dragon Hide", energy:"Cloud Fabric",
                ice:"Quara Scale", holy:"Demon Presence", physical:"—"};
 
+// Transcendence (legs): chance de ativar por tentativa, índice = tier
+const TRANS = [0, 0.13, 0.27, 0.44, 0.64, 0.86, 1.11, 1.38, 1.68, 2.00, 2.35];
+// Amplification (boots): multiplica o efeito de tier das outras peças
+const AMP   = [0, 2.5, 5.4, 9.1, 13.6, 18.9, 25.0, 31.9, 39.6, 48.1, 57.4];
+const AV_TURN = 2;   // uma tentativa a cada 2s
+const AV_DUR  = 7;   // avatar dura 7s
+
 const SLOTS = ["Helmet","Armor","Legs","Boots","Escudo/Spellbook","Amuleto","Anel","Wand"];
 const TIER_MECH = {Helmet:"Momentum", Armor:"Ruse", Legs:"Transcendence", Boots:"Amplification"};
 
 let GEAR = [];
+let MOBS = [];
+
+// Criaturas por área. Se algum nome estiver errado ou faltando, edite direto na linha.
+const CREATURES = {
+  "Putrefactory":  ["Oozing Carcass","Rotten Man-Maggot","Meandering Mushroom"],
+  "Jaded Roots":   ["Sopping Carcass","Bloated Man-Maggot","Mycobiontic Beetle","Rootthing Bug Tracker","Rootthing Amber Shaper","Rootthing Nourisher"],
+  "Darklight Core":["Darklight Emitter","Darklight Matter","Darklight Source","Darklight Striker"],
+  "Gloom Pillars": ["Walking Pillar","Wandering Pillar","Converter"]
+};
+const ELEMS = ["holy","earth","fire","energy","ice","death","physical"];
 
 let GEMS = [];
 
@@ -427,6 +460,21 @@ const TREES = {
 
 /* ---------------- motor ---------------- */
 
+function avatar(){
+  const tier=sl=>{const g=GEAR.find(x=>x.slot===sl); return Math.min(Math.max(g?+g.tier||0:0,0),10);};
+  const lt=tier("Legs"), bt=tier("Boots");
+  const chance=(TRANS[lt]/100)*(1+AMP[bt]/100);          // boots amplificam o tier da legs
+  // renovação: espera média até o proc = AV_TURN/chance, depois AV_DUR de avatar
+  const up = chance>0 ? AV_DUR/(AV_TURN/chance+AV_DUR) : 0;
+  return {lt, bt, chance, up};
+}
+
+function gearElemML(){
+  const em={fire:0,energy:0,death:0};
+  for(const g of GEAR) if(em[g.elem]!==undefined) em[g.elem]+=(+g.eml||0);
+  return em;
+}
+
 function baseFromLevel(L){
   const bands=[[1,500,5],[501,1100,6],[1101,1800,7],[1801,2600,8],[2601,3500,9],[3501,4500,10],[4501,5600,11]];
   let B=0;
@@ -447,7 +495,11 @@ function stanceBonus(){
 
 function readState(){
   const num=id=>parseFloat(document.getElementById(id).value)||0;
-  const pBase=num("crit")/100, EBase=num("cdmg")/100, denBase=1+pBase*EBase;
+  const pBase=num("crit")/100, EBase=num("cdmg")/100;
+  const av=avatar();
+  // no avatar tudo crita: a chance efetiva vira p + u·(1-p)
+  const withAv = x => x + av.up*(1-x);
+  const denBase=1+withAv(pBase)*EBase;
   const sb=stanceBonus();
   const convert=document.getElementById("convert").checked;
 
@@ -457,6 +509,8 @@ function readState(){
   let gemDH=0;
   for(const g of GEMS){
     const v=(parseFloat(g.value)||0)/100;
+    if(g.type==="gcdmg"){ for(const k in SPELLS) ES[k]+=v; continue; }
+    if(g.type==="gcchance"){ for(const k in SPELLS) pS[k]+=v; continue; }
     if(!SPELLS[g.spell]) continue;
     if(g.type==="base") gBase[g.spell]+=v;
     else if(g.type==="cdmg") ES[g.spell]+=v;
@@ -470,6 +524,9 @@ function readState(){
     else if(sb.key==="cchance") pS[k]+=sb.amount/100;
     else if(sb.key==="cdmg") ES[k]+=sb.amount/100;
   }
+
+  // avatar entra por último, depois de todas as fontes aditivas de crit chance
+  for(const k in SPELLS) pS[k]=withAv(pS[k]);
 
   const sens={fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)};
 
@@ -487,9 +544,19 @@ function readState(){
   const dmgEl={};
   for(const k in SPELLS) dmgEl[k]=(convert && sb.el && !SPELLS[k].rune) ? sb.el : SPELLS[k].el;
 
+  // magic level elemental do equipamento: sobe o dano só das magias daquele elemento
+  const emML=gearElemML();
+  const mlNow=Math.max(num("ml"),1), Bnow=baseFromLevel(Math.max(num("level"),1))+Math.max(num("wdmg"),0);
+  const elemFactor={};
+  for(const k in SPELLS){
+    const extra=emML[SPELLS[k].el]||0;
+    const dTot=SPELLS[k].mult*mlNow+Bnow;
+    elemFactor[k]= extra>0 && dTot>0 ? (SPELLS[k].mult*(mlNow+extra)+Bnow)/dTot : 1;
+  }
+
   let weight=0;
   for(const k in SPELLS){
-    powerEff[k]=SPELLS[k].power*(1+gBase[k])*((1+pS[k]*ES[k])/denBase)*((sens[dmgEl[k]]||100)/100);
+    powerEff[k]=SPELLS[k].power*(1+gBase[k])*((1+pS[k]*ES[k])/denBase)*((sens[dmgEl[k]]||100)/100)*elemFactor[k];
     weight+=freq[k]*tg[k]*powerEff[k];
   }
 
@@ -508,6 +575,7 @@ function readState(){
   const B=baseFromLevel(L)+Math.max(num("wdmg"),0)+gemDH;
 
   return {
+    av,
     L, ml, mlSkill, mlRatio: ml>0 ? mlSkill/ml : 0,
     B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH, beamGain, bmLvl,
     p:pBase, E:EBase,
@@ -579,45 +647,68 @@ function renderGear(){
   if(!GEAR.length){ box.innerHTML='<p class="hint" style="margin-top:0">Nenhuma peça lançada.</p>'; }
   else box.innerHTML=GEAR.map((g,i)=>`<div class="gear-row">
     <select data-gi="${i}" data-gf="slot">${SLOTS.map(s=>`<option ${g.slot===s?"selected":""}>${s}</option>`).join("")}</select>
-    <input type="text" data-gi="${i}" data-gf="name" value="${(g.name||"").replace(/"/g,"&quot;")}" placeholder="nome da peça">
     <input type="number" data-gi="${i}" data-gf="tier" value="${g.tier}" min="0" max="12" aria-label="tier">
-    <input type="number" data-gi="${i}" data-gf="ml" value="${g.ml}" min="0" aria-label="magic level">
+    <input type="number" data-gi="${i}" data-gf="ml" value="${g.ml}" min="0" aria-label="magic level global">
+    <select data-gi="${i}" data-gf="elem">${[["none","—"],["fire","fire"],["energy","energy"],["death","death"]].map(([v,l])=>`<option value="${v}" ${g.elem===v?"selected":""}>${l}</option>`).join("")}</select>
+    <input type="number" data-gi="${i}" data-gf="eml" value="${g.eml}" min="0" aria-label="magic level elemental" ${g.elem==="none"?"disabled":""}>
     <input type="number" data-gi="${i}" data-gf="imb" value="${g.imb}" min="0" max="3" aria-label="slots de imbuement">
     <button type="button" class="x" data-gdel="${i}" aria-label="remover">×</button>
   </div>`).join("");
 
   const ml=GEAR.reduce((a,g)=>a+(+g.ml||0),0), imb=GEAR.reduce((a,g)=>a+(+g.imb||0),0);
+  const em=gearElemML();
+  const emTxt=Object.entries(em).filter(([,v])=>v>0).map(([k,v])=>`+${v} ${k} ML`).join(" · ");
   const mech=GEAR.filter(g=>TIER_MECH[g.slot]&&+g.tier>0)
                  .map(g=>`${TIER_MECH[g.slot]} T${g.tier}`).join(" · ");
   document.getElementById("gearSum").textContent=
-    `${GEAR.length} peça(s) · +${ml} de ML · ${imb} slot(s) de imbuement${mech?" · "+mech:""}`;
+    `${GEAR.length} peça(s) · +${ml} de ML global${emTxt?" · "+emTxt:""} · ${imb} slot(s) de imbuement${mech?" · "+mech:""}`;
+}
+
+function seedMobs(){
+  const h=document.getElementById("hunt").value;
+  const d=REGIONS[document.getElementById("region").value][h];
+  const base=(CREATURES[h]||[]);
+  const w=(d&&d.weak&&d.weak[0])||"fire";
+  MOBS=base.map(n=>({name:n,weak:w}));
 }
 
 function renderAdvice(){
   const d=REGIONS[document.getElementById("region").value][document.getElementById("hunt").value];
   const box=document.getElementById("advice");
   const imb=GEAR.reduce((a,g)=>a+(+g.imb||0),0);
+  const mana=Math.max(parseFloat(document.getElementById("mana").value)||0,0);
+  const chpct=Math.max(parseFloat(document.getElementById("chpct").value)||0,0);
 
-  if(!d || !d.weak){
-    box.innerHTML=`<div class="warn">Não tenho as fraquezas nem os elementos de dano desta área confirmados, então não dá para recomendar charm nem proteção sem inventar. Abra o Bestiary de uma criatura da spawn: a lista de <i>weak to</i> te dá o charm e a de dano que ela causa te dá a proteção.</div>`;
-    return;
-  }
+  const mobRows=MOBS.map((m,i)=>`<div class="mob-row">
+      <input type="text" data-mi="${i}" data-mf="name" value="${(m.name||"").replace(/"/g,"&quot;")}" placeholder="criatura">
+      <select data-mi="${i}" data-mf="weak">${ELEMS.map(e=>`<option value="${e}" ${m.weak===e?"selected":""}>fraco a ${e}</option>`).join("")}</select>
+      <span class="k">${CHARM[m.weak]||"—"}</span>
+      <span class="d">Void's Call</span>
+      <button type="button" class="x" data-mdel="${i}" aria-label="remover">×</button>
+    </div>`).join("");
 
-  const charms=d.weak.map((e,i)=>
-    `<div class="adv-row"><span class="k">${i===0?"▸":"○"} ${CHARM[e]||"—"}</span><span class="d">explora a fraqueza a ${e}</span></div>`).join("");
-  const prots=d.deals.map(e=>
+  // Overflux: 2,5% da mana máxima por proc, teto de 8% da vida do alvo.
+  // Charm elemental entrega chpct% da vida máxima do bicho.
+  const hpLimite = chpct>0 ? (0.025*mana)/(chpct/100) : 0;
+  const overflux = hpLimite>0
+    ? `Overflux bate <b>${Math.round(0.025*mana)}</b> por proc com a sua mana. Isso supera um charm elemental em qualquer bicho com vida máxima abaixo de <b>${Math.round(hpLimite).toLocaleString("pt-BR")}</b> — acima disso o elemental ganha. Lembre do teto do Overflux em 8% da vida do alvo, que só morde se o bicho tiver menos de ${Math.round(0.025*mana/0.08).toLocaleString("pt-BR")} de vida.`
+    : "Preencha a mana máxima e o % do charm elemental para comparar com o Overflux.";
+
+  const prots=(d&&d.deals?d.deals:[]).map(e=>
     `<div class="adv-row"><span class="k">${PROT[e]||"—"}</span><span class="d">o bicho bate ${e}${e==="physical"?" — sem imbuement de proteção, resolve com armadura":""}</span></div>`).join("");
 
   box.innerHTML=`
-    <h3 class="sec" style="margin-top:0;border-top:0;padding-top:0">Charm ofensivo</h3>
-    ${charms}
-    <p class="hint">Charm de dano bate uma fatia da vida máxima do bicho no elemento do charm, então quem manda é a fraqueza dele, não a sua rotação. O primeiro da lista é a fraqueza mais citada da área. Lembrando que o <b>pierce não soma no dano de charm</b>.</p>
-    <h3 class="sec">Proteções sugeridas</h3>
-    ${prots}
+    <h3 class="sec" style="margin-top:0;border-top:0;padding-top:0">Charm por criatura</h3>
+    <div class="mob-row mob-head"><span>CRIATURA</span><span>FRAQUEZA</span><span>MAJOR</span><span>MINOR</span><span></span></div>
+    ${mobRows||'<p class="hint" style="margin-top:0">Nenhuma criatura listada para esta hunt.</p>'}
+    <button type="button" id="addmob" class="ghost" style="margin-top:8px">+ adicionar criatura</button>
+    <p class="hint">A fraqueza vem do Bestiary de cada bicho — ajuste a linha se o meu palpite estiver errado, que o Major charm se recalcula. Charm de dano bate uma fatia da vida máxima do alvo no elemento do charm, então quem manda é a resistência dele, não a sua rotação. Charm <b>não recebe pierce</b>.</p>
+    <div class="warn" style="background:#121A16;border-color:#2E4A3E;color:#BFD8CB">${overflux}</div>
+    ${prots?`<h3 class="sec">Proteções sugeridas</h3>${prots}`:""}
     <h3 class="sec">Sustentação</h3>
     <div class="adv-row"><span class="k">Void</span><span class="d">mana leech — praticamente obrigatório numa rotação de spam</span></div>
     <div class="adv-row"><span class="k">Vampirism</span><span class="d">life leech — troque por uma proteção se o pull estiver seguro</span></div>
-    <p class="hint" style="margin-bottom:0">Você declarou <b>${imb} slot(s)</b> de imbuement no equipamento. Com o padrão de mago, priorize Void, depois a proteção do elemento que mais dói, e só então a segunda proteção ou Vampirism. Isto é uma heurística montada a partir dos elementos que a área usa — não é uma tabela testada de custo-benefício por hunt.</p>`;
+    <p class="hint" style="margin-bottom:0">Você declarou <b>${imb} slot(s)</b> de imbuement no equipamento. Priorize Void, depois a proteção do elemento que mais dói, e só então a segunda proteção ou Vampirism. Heurística a partir dos elementos da área, não uma tabela testada hunt a hunt.</p>`;
 }
 
 function renderStance(S){
@@ -637,6 +728,13 @@ function render(){
   renderStance(S);
   renderAdvice();
   document.getElementById("bTotal").textContent=S.B+(S.gemDH?"  (gemas +"+S.gemDH+")":"");
+
+  const av=S.av;
+  document.getElementById("avatarOut").innerHTML = av.chance>0
+    ? `Legs T${av.lt} = ${(TRANS[av.lt]).toFixed(2)}% por tentativa, amplificado pelas boots T${av.bt} (+${AMP[av.bt]}%) → <b>${(av.chance*100).toFixed(2)}%</b> a cada ${AV_TURN}s.<br>
+       Avatar de ${AV_DUR}s rodando <b>${(av.up*100).toFixed(1)}%</b> do tempo — em 1h de hunt, ${(av.up*3600).toFixed(0)}s de avatar em ${(3600/(AV_TURN/av.chance+AV_DUR)).toFixed(0)} ativações.<br>
+       Crit chance efetivo: ${(S.p*100).toFixed(1)}% → <b>${((S.p+av.up*(1-S.p))*100).toFixed(1)}%</b>.`
+    : "Sem legs com tier lançada no equipamento — avatar fora da conta.";
 
   const beams=Object.keys(SPELLS).filter(k=>SPELLS[k].beam);
   document.getElementById("beamOut").textContent = S.bmLvl
@@ -706,7 +804,7 @@ const P_SEL=["region","hunt","stance","qSE","qSD","qNE","qND","procmode"];
 const STORE_KEY="perkcalc.preset.v1";
 
 function collectPreset(){
-  const o={v:2, num:{}, sel:{}, convert:document.getElementById("convert").checked, rot:{}, gems:GEMS, gear:GEAR};
+  const o={v:2, num:{}, sel:{}, convert:document.getElementById("convert").checked, rot:{}, gems:GEMS, gear:GEAR, mobs:MOBS, mana:document.getElementById("mana").value, chpct:document.getElementById("chpct").value};
   P_NUM.forEach(i=>o.num[i]=document.getElementById(i).value);
   P_SEL.forEach(i=>o.sel[i]=document.getElementById(i).value);
   for(const k in SPELLS) o.rot[k]={fq:document.getElementById("fq_"+k).value, tg:document.getElementById("tg_"+k).value};
@@ -738,6 +836,9 @@ function applyPreset(o){
   }
   GEMS=Array.isArray(o.gems)?o.gems.filter(g=>g&&GEM_TYPES[g.type]):[];
   GEAR=Array.isArray(o.gear)?o.gear:[];
+  if(Array.isArray(o.mobs)) MOBS=o.mobs;
+  if(o.mana!==undefined) document.getElementById("mana").value=o.mana;
+  if(o.chpct!==undefined) document.getElementById("chpct").value=o.chpct;
   renderGems(); renderGear(); freqSum(); render();
 }
 
@@ -803,7 +904,7 @@ function renderGems(){
   const box=document.getElementById("gems");
   if(!GEMS.length){ box.innerHTML='<p class="hint" style="margin-top:0">Nada lançado ainda.</p>'; return; }
   box.innerHTML=GEMS.map((g,i)=>`<div class="gem-row">
-    <select data-i="${i}" data-f="spell">${Object.entries(SPELLS).map(([k,s])=>`<option value="${k}" ${g.spell===k?"selected":""}>${s.label}</option>`).join("")}</select>
+    <select data-i="${i}" data-f="spell" ${g.type&&g.type[0]==="g"?"disabled":""}>${Object.entries(SPELLS).map(([k,s])=>`<option value="${k}" ${g.spell===k?"selected":""}>${s.label}</option>`).join("")}</select>
     <select data-i="${i}" data-f="type">${Object.entries(GEM_TYPES).map(([k,v])=>`<option value="${k}" ${g.type===k?"selected":""}>${v}</option>`).join("")}</select>
     <input type="number" data-i="${i}" data-f="value" value="${g.value}" step="0.5" aria-label="valor">
     <button type="button" class="x" data-del="${i}" aria-label="remover">×</button>
@@ -817,6 +918,7 @@ function applyHunt(){
   document.getElementById("sEnergy").value=d.sens.energy;
   document.getElementById("sDeath").value=d.sens.death;
   if(d.stance) document.getElementById("stance").value=d.stance;
+  seedMobs();
   const f=d.freq||DEFAULT_FREQ;
   for(const k in SPELLS) document.getElementById("fq_"+k).value=f[k]||0;
 
@@ -859,10 +961,16 @@ function init(){
   renderGear();
   buildHunts();
 
+  const mobEdit=t=>{
+    if(!t.dataset || t.dataset.mf===undefined) return false;
+    MOBS[t.dataset.mi][t.dataset.mf]=t.value;
+    if(t.dataset.mf!=="name") renderAdvice();   // nome não muda charm: não redesenha, não perde o foco
+    return true;
+  };
   const gearEdit=t=>{
     if(!t.dataset || t.dataset.gf===undefined) return false;
     const f=t.dataset.gf;
-    GEAR[t.dataset.gi][f]= (f==="name"||f==="slot") ? t.value : (parseFloat(t.value)||0);
+    GEAR[t.dataset.gi][f]= (f==="slot"||f==="elem") ? t.value : (parseFloat(t.value)||0);
     renderGear(); render(); return true;
   };
   const gemEdit=t=>{
@@ -872,11 +980,14 @@ function init(){
     render(); return true;
   };
   document.addEventListener("input",e=>{
+    if(e.target.id==="mana"||e.target.id==="chpct"){ renderAdvice(); return; }
+    if(mobEdit(e.target)) return;
     if(gearEdit(e.target)) return;
     if(gemEdit(e.target)) return;
     if(e.target.tagName==="INPUT"){ freqSum(); render(); }
   });
   document.addEventListener("change",e=>{
+    if(mobEdit(e.target)) return;
     if(gearEdit(e.target)) return;
     if(gemEdit(e.target)) return;
     if(["stance","qSE","qND","procmode","convert"].includes(e.target.id)) render();
@@ -885,11 +996,14 @@ function init(){
     const d=e.target.dataset ? e.target.dataset.del : undefined;
     if(d!==undefined){ GEMS.splice(+d,1); renderGems(); render(); return; }
     const gd=e.target.dataset ? e.target.dataset.gdel : undefined;
-    if(gd!==undefined){ GEAR.splice(+gd,1); renderGear(); render(); }
+    if(gd!==undefined){ GEAR.splice(+gd,1); renderGear(); render(); return; }
+    const md=e.target.dataset ? e.target.dataset.mdel : undefined;
+    if(md!==undefined){ MOBS.splice(+md,1); renderAdvice(); return; }
+    if(e.target.id==="addmob"){ MOBS.push({name:"",weak:"fire"}); renderAdvice(); }
   });
 
   document.getElementById("addgear").addEventListener("click",()=>{
-    GEAR.push({slot:"Helmet",name:"",tier:0,ml:0,imb:2});
+    GEAR.push({slot:"Helmet",tier:0,ml:0,elem:"none",eml:0,imb:2});
     renderGear(); render();
   });
   document.getElementById("addgem").addEventListener("click",()=>{
