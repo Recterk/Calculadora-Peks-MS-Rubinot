@@ -60,6 +60,13 @@ button.x:hover{color:var(--sanguine)}
 .stance-out .fire b{color:var(--fire)} .stance-out .energy b{color:var(--energy)} .stance-out .death b{color:var(--death)}
 .stance-out .off{color:var(--ash);opacity:.45}
 
+.presetbar{padding:14px 16px}
+.pb-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:620px){.pb-row{grid-template-columns:1fr}}
+.pb-status{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ash);margin-top:10px;line-height:1.5}
+.pb-status.ok{color:var(--ok)}
+.pb-status.err{color:var(--sanguine)}
+
 .gem-row{display:grid;grid-template-columns:1fr 150px 74px 30px;gap:7px;align-items:center;margin-bottom:7px}
 @media(max-width:620px){.gem-row{grid-template-columns:1fr 1fr;gap:6px}}
 .gem-row select,.gem-row input{font-size:12.5px;padding:6px 7px}
@@ -174,6 +181,16 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
 </aside>
 
 <main>
+  <div class="panel presetbar">
+    <div class="pb-row">
+      <button type="button" class="ghost" id="pSave">↓ Salvar preset em arquivo</button>
+      <button type="button" class="ghost" id="pLoadBtn">↑ Carregar preset</button>
+      <button type="button" class="ghost" id="pStore">Guardar neste navegador</button>
+      <input type="file" id="pLoad" accept="application/json,.json" hidden>
+    </div>
+    <div class="pb-status" id="pStatus">O preset guarda tudo: personagem, hunt, sensibilidades, roda, gemas e rotação.</div>
+  </div>
+
   <div class="panel">
     <h2>Roda de Destino</h2>
 
@@ -185,10 +202,14 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
         <select id="qSD"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
       <div class="field"><label for="qNE">Norte-Esquerda</label>
         <select id="qNE"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
-      <div class="field"><label for="qND">Norte-Direita</label>
-        <select id="qND"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
+      <div class="field"><label for="qND">Norte-Direita — Beam Mastery</label>
+        <select id="qND"><option value="0">Nv 0 — sem revelation</option><option value="1">Nv 1 — +10% por bicho</option><option value="2">Nv 2 — +12% por bicho</option><option value="3" selected>Nv 3 — +14% por bicho</option></select></div>
     </div>
-    <p class="hint">Só o Sul-Esquerda entra na conta, porque é onde mora o Lord of Destruction. Os outros três ficam de registro — não tenho a tabela que converte pontos de roda em damage and healing, então esse número você lê da roda e digita abaixo.</p>
+    <p class="hint">Sul-Esquerda e Norte-Direita entram na conta — é onde moram o Lord of Destruction e o Beam Mastery. Sul-Direita e Norte-Esquerda ficam de registro: não tenho a tabela que converte pontos de roda em damage and healing, então esse número você lê da roda e digita abaixo.</p>
+
+    <h3 class="sec">Beam Mastery — o que está somando</h3>
+    <div class="out" id="beamOut" style="text-align:left;padding:9px 11px">—</div>
+    <p class="hint">Vale para Great Energy Beam e Great Death Beam e conta até 3 bichos — quem define quantos é a coluna <b>alvos por cast</b> da rotação.</p>
 
     <h3 class="sec">Stance ativa — o que ela está somando</h3>
     <div class="stance-out" id="stanceOut"></div>
@@ -233,8 +254,10 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
   <footer>
     <details>
       <summary>Como as contas são feitas</summary>
-      <p><b>Elemental stances.</b> A promoção já dá +4% base power para magias de fire, +4% crit hit chance para magias de energy e +30% crit extra damage para magias de death, conforme a stance ativa. O <b>Lord of Destruction</b> (Sul-Esquerda) soma +2/3/4 pontos nas duas primeiras e +15/22,5/30 na terceira, chegando a 8%, 8% e 60% no Nv 3. Stances valem só para <b>magias</b>: a Sudden Death, por ser runa, fica de fora.</p>
-      <p><b>Base power</b> é calculado. Ele parte do valor da magia e recebe, nesta ordem: perks de base damage (multiplicam direto), perks de crítico convertidos para dano médio pela razão (1 + p'·E') ÷ (1 + p·E), e a sensibilidade do bicho ao elemento daquele dano.</p>
+      <p><b>Elemental stances.</b> A promoção já dá +4% base power para magias de fire, +4% crit hit chance para magias de energy e +30% crit extra damage para magias de death, conforme a stance ativa. O <b>Lord of Destruction</b> (Sul-Esquerda) soma +2/3/4 pontos nas duas primeiras e +15/25/30 na terceira, chegando a 8%, 8% e 60% no Nv 3. Stances valem só para <b>magias</b>: a Sudden Death, por ser runa, fica de fora.</p>
+      <p><b>Beam Mastery</b> (Norte-Direita). Soma base damage por bicho atingido, com teto de 3: +10% por bicho no Nv 1, +12% no Nv 2 e +14% no Nv 3. Entra só no Great Energy Beam e no Great Death Beam, e quem define quantos bichos contam é a coluna <b>alvos por cast</b> — beam pegando 3 no Nv 3 vira +42% de base power.</p>
+      <p><b>Preset.</b> O botão de salvar baixa um .json com tudo que está na tela; o de carregar aceita esse mesmo arquivo de volta. Guardar neste navegador usa o armazenamento local — prático, mas some se você trocar de máquina ou limpar o navegador, então o arquivo é o que vale para valer.</p>
+      <p><b>Base power</b> é calculado. Ele parte do valor da magia e recebe, nesta ordem: perks de base damage e beam mastery (multiplicam direto), perks de crítico convertidos para dano médio pela razão (1 + p'·E') ÷ (1 + p·E), e a sensibilidade do bicho ao elemento daquele dano.</p>
       <p><b>% dano</b> = <code>% na rotação × alvos × base power</code>, normalizado para 100. É o peso real de cada magia e pondera todo perk elemental ou de magia específica.</p>
       <p><b>Damage and healing</b> soma no mesmo lugar que o dano-base do level: <code>B = B(level) + roda + gemas</code>. Como o w é <code>mult·ML ÷ (mult·ML + B)</code>, esses pontos <i>reduzem</i> o w e, com ele, o valor do perk de % da skill. B(level): +1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500.</p>
       <p><code>crit extra +y%</code> = Σ fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = Σ fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w. As somas correm magia a magia, com o p e o E de cada uma — então a stance de death, que infla o E das magias de death, já derruba sozinha o valor de somar mais crit extra damage nelas.</p>
@@ -257,17 +280,21 @@ const SPELLS = {
   gfw:        {label:"Great Fire Wave",   alias:"grand flam hur", el:"fire",   mult:9.0,  src:false, power:100, tg:4},
   rage:       {label:"Rage of the Skies", alias:"mas vis",        el:"energy", mult:8.5,  src:true,  power:200, tg:6},
   energywave: {label:"Energy Wave",       alias:"vis hur",        el:"energy", mult:6.75, src:true,  power:150, tg:4},
-  energybeam: {label:"Great Energy Beam", alias:"vis lux",        el:"energy", mult:5.5,  src:true,  power:155, tg:3},
-  deathbeam:  {label:"Great Death Beam",  alias:"max mort",       el:"death",  mult:5.5,  src:false, power:155, tg:3},
+  energybeam: {label:"Great Energy Beam", alias:"vis lux",        el:"energy", mult:5.5,  src:true,  power:155, tg:3, beam:true},
+  deathbeam:  {label:"Great Death Beam",  alias:"max mort",       el:"death",  mult:5.5,  src:false, power:155, tg:3, beam:true},
   deathecho:  {label:"Death Echo",        alias:"death eco",      el:"death",  mult:8.0,  src:false, power:75,  tg:5},
   sd:         {label:"Sudden Death",      alias:"runa · power ~", el:"death",  mult:6.0,  src:true,  power:130, tg:1, rune:true}
 };
+
+// Beam Mastery: % de base damage por bicho atingido, até 3 bichos. Índice = nível.
+const BEAM_RATE = [0, 10, 12, 14];
+const BEAM_CAP = 3;
 
 // stance base (promoção) + extensão do Lord of Destruction por nível do Sul-Esquerda
 const STANCE = {
   fire:   {base:4,  lod:[0,2,3,4],       stat:"base power",        key:"base"},
   energy: {base:4,  lod:[0,2,3,4],       stat:"crit hit chance",   key:"cchance"},
-  death:  {base:30, lod:[0,15,22.5,30],  stat:"crit extra damage", key:"cdmg"}
+  death:  {base:30, lod:[0,15,25,30],    stat:"crit extra damage", key:"cdmg"}
 };
 
 const GEM_TYPES = {
@@ -403,14 +430,22 @@ function readState(){
 
   const sens={fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)};
 
+  const freq={}, tg={}, powerEff={}, beamGain={};
+  const bmLvl=parseInt(document.getElementById("qND").value,10)||0;
+  for(const k in SPELLS){
+    freq[k]=Math.max(num("fq_"+k),0);
+    tg[k]=Math.max(num("tg_"+k),1);
+    // Beam Mastery: base damage por bicho atingido, teto de 3
+    beamGain[k]= SPELLS[k].beam ? BEAM_RATE[bmLvl]*Math.min(tg[k],BEAM_CAP)/100 : 0;
+    gBase[k]+=beamGain[k];
+  }
+
   // elemento com que o dano chega no bicho
   const dmgEl={};
   for(const k in SPELLS) dmgEl[k]=(convert && sb.el && !SPELLS[k].rune) ? sb.el : SPELLS[k].el;
 
-  const freq={}, tg={}, powerEff={}; let weight=0;
+  let weight=0;
   for(const k in SPELLS){
-    freq[k]=Math.max(num("fq_"+k),0);
-    tg[k]=Math.max(num("tg_"+k),1);
     powerEff[k]=SPELLS[k].power*(1+gBase[k])*((1+pS[k]*ES[k])/denBase)*((sens[dmgEl[k]]||100)/100);
     weight+=freq[k]*tg[k]*powerEff[k];
   }
@@ -429,7 +464,7 @@ function readState(){
   const B=baseFromLevel(L)+Math.max(num("wdmg"),0)+gemDH;
 
   return {
-    L, ml, B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH,
+    L, ml, B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH, beamGain, bmLvl,
     p:pBase, E:EBase,
     procmode:document.getElementById("procmode").value,
     w:(mult*ml)/(mult*ml+B),
@@ -508,17 +543,22 @@ function render(){
   renderStance(S);
   document.getElementById("bTotal").textContent=S.B+(S.gemDH?"  (gemas +"+S.gemDH+")":"");
 
+  const beams=Object.keys(SPELLS).filter(k=>SPELLS[k].beam);
+  document.getElementById("beamOut").textContent = S.bmLvl
+    ? beams.map(k=>`${SPELLS[k].alias} +${(S.beamGain[k]*100).toFixed(0)}%`).join("  ·  ")
+    : "desligado";
+
   for(const k in SPELLS){
     const pw=document.getElementById("pw_"+k);
     const eff=S.powerEff[k], boosted=Math.abs(eff-SPELLS[k].power)>0.05;
     pw.textContent=eff.toFixed(0);
     pw.classList.toggle("boosted",boosted);
-    pw.title=boosted?`base ${SPELLS[k].power} → ${eff.toFixed(1)} com gemas, stance e sensibilidade`:`base ${SPELLS[k].power}, sem modificador`;
+    pw.title=boosted?`base ${SPELLS[k].power} → ${eff.toFixed(1)} com gemas, stance, beam mastery e sensibilidade`:`base ${SPELLS[k].power}, sem modificador`;
 
     const st=document.getElementById("st_"+k);
     const hasStance=S.sb.el && !SPELLS[k].rune && SPELLS[k].el===S.sb.el;
-    st.textContent=SPELLS[k].alias+(SPELLS[k].src?"":" · mult ~")+(hasStance?" · stance":"");
-    st.classList.toggle("st",!!hasStance);
+    st.textContent=SPELLS[k].alias+(SPELLS[k].src?"":" · mult ~")+(hasStance?" · stance":"")+(S.beamGain[k]?" · beam":"");
+    st.classList.toggle("st",!!(hasStance||S.beamGain[k]));
 
     const cell=document.getElementById("sh_"+k);
     const pct=S.share[k]*100;
@@ -562,6 +602,92 @@ function render(){
         ${vals.length===1&&!isShape?'<span class="badge">nível fixo</span>':""}</div>
       <div class="opts" ${isShape?'style="opacity:.45"':""}>${rows}</div>${box}</div>`;
   }).join("");
+}
+
+/* ---------------- presets ---------------- */
+
+const P_NUM=["level","ml","crit","cdmg","bclass","sFire","sEnergy","sDeath","wdmg"];
+const P_SEL=["region","hunt","stance","qSE","qSD","qNE","qND","procmode"];
+const STORE_KEY="perkcalc.preset.v1";
+
+function collectPreset(){
+  const o={v:1, num:{}, sel:{}, convert:document.getElementById("convert").checked, rot:{}, gems:GEMS};
+  P_NUM.forEach(i=>o.num[i]=document.getElementById(i).value);
+  P_SEL.forEach(i=>o.sel[i]=document.getElementById(i).value);
+  for(const k in SPELLS) o.rot[k]={fq:document.getElementById("fq_"+k).value, tg:document.getElementById("tg_"+k).value};
+  return o;
+}
+
+function applyPreset(o){
+  if(!o||typeof o!=="object") throw new Error("arquivo sem conteúdo de preset");
+  // região primeiro: a lista de hunts depende dela, e applyHunt sobrescreve campos
+  if(o.sel && o.sel.region && REGIONS[o.sel.region]){
+    const rs=document.getElementById("region");
+    rs.value=o.sel.region;
+    document.getElementById("hunt").innerHTML=Object.keys(REGIONS[o.sel.region]).map(h=>`<option>${h}</option>`).join("");
+    if(o.sel.hunt && REGIONS[o.sel.region][o.sel.hunt]) document.getElementById("hunt").value=o.sel.hunt;
+    applyHunt();
+  }
+  // agora os valores salvos por cima dos defaults da hunt
+  P_NUM.forEach(i=>{ if(o.num && o.num[i]!==undefined) document.getElementById(i).value=o.num[i]; });
+  P_SEL.forEach(i=>{ if(i==="region"||i==="hunt") return;
+    if(o.sel && o.sel[i]!==undefined) document.getElementById(i).value=o.sel[i]; });
+  document.getElementById("convert").checked=!!o.convert;
+  // preset antigo: o beam mastery era um campo solto antes de virar o Norte-Direita
+  if(o.sel && o.sel.beam!==undefined && (!o.sel.qND || o.sel.qND==="0"))
+    document.getElementById("qND").value=o.sel.beam;
+  for(const k in SPELLS){
+    if(!o.rot||!o.rot[k]) continue;
+    document.getElementById("fq_"+k).value=o.rot[k].fq;
+    document.getElementById("tg_"+k).value=o.rot[k].tg;
+  }
+  GEMS=Array.isArray(o.gems)?o.gems.filter(g=>g&&GEM_TYPES[g.type]):[];
+  renderGems(); freqSum(); render();
+}
+
+function status(msg,cls){
+  const el=document.getElementById("pStatus");
+  el.textContent=msg; el.className="pb-status"+(cls?" "+cls:"");
+}
+
+function savePresetFile(){
+  const blob=new Blob([JSON.stringify(collectPreset(),null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  const h=document.getElementById("hunt").value.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+  a.href=URL.createObjectURL(blob);
+  a.download=`preset-${h||"perks"}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status("Preset baixado. Guarde o arquivo e use Carregar preset da próxima vez.","ok");
+}
+
+function loadPresetFile(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{ applyPreset(JSON.parse(r.result)); status("Preset carregado de "+file.name+".","ok"); }
+    catch(err){ status("Não deu para ler esse arquivo: "+err.message+". Ele precisa ser um preset salvo por esta página.","err"); }
+  };
+  r.onerror=()=>status("Falha ao abrir o arquivo.","err");
+  r.readAsText(file);
+}
+
+function storeLocal(){
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify(collectPreset()));
+    status("Guardado neste navegador. Ao voltar, a página carrega sozinha.","ok");
+  }catch(e){
+    status("Este navegador não deixou guardar (modo privado ou bloqueio). Use o arquivo.","err");
+  }
+}
+
+function restoreLocal(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(!raw) return false;
+    applyPreset(JSON.parse(raw));
+    status("Preset deste navegador carregado.","ok");
+    return true;
+  }catch(e){ return false; }
 }
 
 /* ---------------- UI ---------------- */
@@ -648,7 +774,7 @@ function init(){
   });
   document.addEventListener("change",e=>{
     if(gemEdit(e.target)) return;
-    if(["stance","qSE","procmode","convert"].includes(e.target.id)) render();
+    if(["stance","qSE","qND","procmode","convert"].includes(e.target.id)) render();
   });
   document.addEventListener("click",e=>{
     const d=e.target.dataset ? e.target.dataset.del : undefined;
@@ -660,9 +786,19 @@ function init(){
     renderGems(); render();
   });
 
+  document.getElementById("pSave").addEventListener("click",savePresetFile);
+  document.getElementById("pStore").addEventListener("click",storeLocal);
+  document.getElementById("pLoadBtn").addEventListener("click",()=>document.getElementById("pLoad").click());
+  document.getElementById("pLoad").addEventListener("change",e=>{
+    const f=e.target.files && e.target.files[0];
+    if(f) loadPresetFile(f);
+    e.target.value="";
+  });
+
   document.getElementById("tab-coil").addEventListener("click",()=>switchTab("coil"));
   document.getElementById("tab-stellar").addEventListener("click",()=>switchTab("stellar"));
   freqSum(); render();
+  restoreLocal();
 }
 
 init();
