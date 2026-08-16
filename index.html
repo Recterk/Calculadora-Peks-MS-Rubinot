@@ -67,6 +67,14 @@ button.x:hover{color:var(--sanguine)}
 .pb-status.ok{color:var(--ok)}
 .pb-status.err{color:var(--sanguine)}
 
+.gear-row{display:grid;grid-template-columns:140px 1fr 62px 62px 62px 30px;gap:7px;align-items:center;margin-bottom:7px}
+@media(max-width:620px){.gear-row{grid-template-columns:1fr 1fr 1fr;gap:6px}}
+.gear-row input,.gear-row select{font-size:12.5px;padding:6px 7px}
+input[type=text]{width:100%;background:var(--void);border:1px solid var(--line);color:var(--bone);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:8px 9px;border-radius:2px}
+.adv-row{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:6px 0;font-size:13.5px;border-top:1px solid var(--line)}
+.adv-row:first-of-type{border-top:0}
+.adv-row .k{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gild)}
+.adv-row .d{color:var(--ash);font-size:12.5px}
 .gem-row{display:grid;grid-template-columns:1fr 150px 74px 30px;gap:7px;align-items:center;margin-bottom:7px}
 @media(max-width:620px){.gem-row{grid-template-columns:1fr 1fr;gap:6px}}
 .gem-row select,.gem-row input{font-size:12.5px;padding:6px 7px}
@@ -151,12 +159,14 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
     <h2>Personagem</h2>
     <div class="grid2">
       <div class="field"><label for="level">Level</label><input type="number" id="level" value="1846" min="1"></div>
-      <div class="field"><label for="ml">Magic Level (total)</label><input type="number" id="ml" value="157" min="1"></div>
+      <div class="field"><label for="ml">ML total (barra)</label><input type="number" id="ml" value="157" min="1"></div>
+      <div class="field"><label for="mlbase">ML treinado (sem equip.)</label><input type="number" id="mlbase" value="140" min="1"></div>
+      <div class="field"><label for="loy">Loyalty %</label><input type="number" id="loy" value="0" step="0.1" min="0"></div>
       <div class="field"><label for="crit">Crit chance %</label><input type="number" id="crit" value="20" step="0.5" min="0"></div>
       <div class="field"><label for="cdmg">Crit extra damage %</label><input type="number" id="cdmg" value="60" step="1" min="0"></div>
     </div>
-    <p class="hint">Totais da Cyclopedia <b>sem a stance ativa</b> — o bônus da stance é somado aqui embaixo, por magia, para não contar duas vezes.</p>
-    <div class="field" style="margin-bottom:0"><label for="bclass">Bestiário: % da spawn na classe</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
+    <p class="hint">Crit <b>sem a stance ativa</b> — o bônus dela é somado por magia mais abaixo, para não contar duas vezes. O ML total move o dano de tudo; o treinado + loyalty é o que o perk de "% da maior skill" enxerga.</p>
+    <div class="field" style="margin-bottom:0"><label for="bclass">Augment Human da Channeler: % da spawn que é Human</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
   </div>
 
   <div class="panel">
@@ -227,6 +237,26 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
   </div>
 
   <div class="panel">
+    <h2>Equipamento</h2>
+    <div class="gear-row" style="margin-bottom:8px">
+      <span class="rot-head" style="font-size:10px;color:var(--ash)">SLOT</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash)">NOME</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">TIER</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">ML</span>
+      <span class="rot-head" style="font-size:10px;color:var(--ash);text-align:center">IMB</span><span></span>
+    </div>
+    <div id="gear"></div>
+    <button type="button" id="addgear" class="ghost">+ adicionar peça</button>
+    <div class="sum"><span id="gearSum">—</span></div>
+    <p class="hint" style="margin-bottom:0">O tier de <b>Legs</b> (Transcendence) e <b>Boots</b> (Amplification) fica registrado aqui, mas não entra na conta de dano: são procs com uptime que eu teria que chutar. Os <b>augments</b> das peças você lança na lista de gemas abaixo — augment é modificador de magia, então cai na mesma matemática. E não tenho catálogo dos itens: nome e valores são digitados.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Charms e imbuements para esta hunt</h2>
+    <div id="advice"></div>
+  </div>
+
+  <div class="panel">
     <h2>Rotação</h2>
     <div class="rot-grid rot-head">
       <span>Magia</span><span>% na rotação</span><span>Alvos por cast</span><span class="calc">Base power</span><span class="calc">% dano</span>
@@ -262,7 +292,11 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       <p><b>Damage and healing</b> soma no mesmo lugar que o dano-base do level: <code>B = B(level) + roda + gemas</code>. Como o w é <code>mult·ML ÷ (mult·ML + B)</code>, esses pontos <i>reduzem</i> o w e, com ele, o valor do perk de % da skill. B(level): +1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500.</p>
       <p><code>crit extra +y%</code> = Σ fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = Σ fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w. As somas correm magia a magia, com o p e o E de cada uma — então a stance de death, que infla o E das magias de death, já derruba sozinha o valor de somar mais crit extra damage nelas.</p>
       <p><b>Perks elementais da árvore</b> são calculados pelo elemento <b>nativo</b> da magia. Se o seu servidor faz o bônus seguir o elemento convertido, o resultado muda — é a dúvida que o marcador de conversão não resolve, porque ele só reencaminha sensibilidade e pierce.</p>
-      <p><b>Pierce</b> soma pontos na sensibilidade do alvo e o ganho é ΔS/S. O acréscimo cai pela metade acima de 100% e nunca sobe sensibilidade 0%.</p>
+      <p><b>Pierce</b> soma pontos na sensibilidade do alvo e o ganho é ΔS/S, com três limites: o acréscimo cai pela metade acima de 100% (bicho em 110% com 4% de pierce vai a 112%), sensibilidade 0% nunca sobe, e o resultado <b>nunca passa do dobro</b> da sensibilidade original — bicho em 5% com 12% de pierce para em 10%, não em 17%.</p>
+      <p><b>ML total × ML da skill.</b> O perk da Coil diz "do seu Magic Level" e usa o total da barra, com equipamento e tudo. Já o perk moldável fala em "maior habilidade de combate", e aqui ele conta só ML treinado + loyalty — por isso o valor dele sai multiplicado por (ML treinado ÷ ML total). Quanto mais ML você tira de equipamento, pior fica esse perk em relação ao da árvore.</p>
+      <p><b>Charms.</b> Charm de dano bate uma fatia da vida máxima do bicho no elemento do charm, então a escolha segue a fraqueza da criatura e não a sua rotação. A lista sai das fraquezas documentadas da área. Charm não recebe pierce.</p>
+      <p><b>Imbuements.</b> A sugestão cruza os elementos que a área usa contra você com o padrão de mago (Void primeiro, depois proteção). É heurística a partir dos elementos da área, não uma tabela testada hunt a hunt.</p>
+      <p><b>Equipamento.</b> Nome, tier, ML e slots são registro seu — não existe catálogo de itens embutido. Augments de item entram na lista de gemas, porque matematicamente são a mesma coisa: modificador de uma magia. Tier de Legs (Transcendence) e Boots (Amplification) fica anotado mas fora da conta, porque são procs cujo uptime eu teria que chutar.</p>
       <p><b>Fora da conta de propósito:</b> Focus Mastery e outros bônus que multiplicam o dano inteiro por igual. Eles mudam quanto você bate, mas não mudam qual perk é melhor — saem na divisão.</p>
       <p><b>Multiplicador de ML</b> (define o w, não confundir com base power): Hell's Core 10,5, Rage of the Skies 8,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki; Great Fire Wave, Death Echo e Great Death Beam são <b>estimados</b> (marcados com ~).</p>
       <p><b>Rubinot é OT.</b> Fórmulas de dano, crit e a implementação da proficiência podem divergir do global. Confirme na Cyclopedia e no Bestiary antes de gastar dust.</p>
@@ -300,21 +334,31 @@ const STANCE = {
 const GEM_TYPES = {
   base:    "base damage (magia)",
   cdmg:    "crit extra damage (magia)",
-  cchance: "crit hit chance (magia)",
-  dh:      "damage and healing (pontos)"
+  cchance: "crit hit chance (magia)"
 };
+
+// charm ofensivo por elemento e imbuement de proteção por elemento
+const CHARM = {holy:"Divine Wrath", earth:"Poison", fire:"Enflame", energy:"Zap",
+               ice:"Freeze", death:"Curse", physical:"Wound"};
+const PROT  = {death:"Lich Shroud", earth:"Snake Skin", fire:"Dragon Hide", energy:"Cloud Fabric",
+               ice:"Quara Scale", holy:"Demon Presence", physical:"—"};
+
+const SLOTS = ["Helmet","Armor","Legs","Boots","Escudo/Spellbook","Amuleto","Anel","Wand"];
+const TIER_MECH = {Helmet:"Momentum", Armor:"Ruse", Legs:"Transcendence", Boots:"Amplification"};
+
+let GEAR = [];
 
 let GEMS = [];
 
 const REGIONS = {
   "Rotten Blood":{
-    "Putrefactory":   {sens:{fire:110,energy:90,death:90},  stance:"fire",   verified:true, note:"Sensível a Holy, Earth e Fire. Cospe Death/Ice/Energy.",
+    "Putrefactory":   {sens:{fire:110,energy:90,death:90},  stance:"fire",  weak:["holy","earth","fire"], deals:["death","ice","energy"],   verified:true, note:"Sensível a Holy, Earth e Fire. Cospe Death/Ice/Energy.",
                        freq:{gfw:65,hellscore:35}},
-    "Darklight Core": {sens:{fire:110,energy:90,death:100}, stance:"fire",   verified:true, note:"Sensível a Earth, Fire e Physical. Cospe Energy/Physical/Ice.",
+    "Darklight Core": {sens:{fire:110,energy:90,death:100}, stance:"fire",  weak:["earth","fire","physical"], deals:["energy","physical","ice"],   verified:true, note:"Sensível a Earth, Fire e Physical. Cospe Energy/Physical/Ice.",
                        freq:{gfw:55,hellscore:25,deathecho:20}},
-    "Gloom Pillars":  {sens:{fire:90,energy:110,death:110}, stance:"death",  verified:true, note:"Sensível a Physical, Death e Energy. Cospe Holy/Fire/Earth.",
+    "Gloom Pillars":  {sens:{fire:90,energy:110,death:110}, stance:"death", weak:["physical","death","energy"], deals:["holy","fire","earth"],  verified:true, note:"Sensível a Physical, Death e Energy. Cospe Holy/Fire/Earth.",
                        freq:{deathecho:30,deathbeam:25,energywave:25,rage:20}},
-    "Jaded Roots":    {sens:{fire:90,energy:110,death:100}, stance:"energy", verified:true, note:"Sensível a Energy, Ice e Holy. Cospe Earth/Physical/Fire.",
+    "Jaded Roots":    {sens:{fire:90,energy:110,death:100}, stance:"energy",weak:["energy","ice","holy"], deals:["earth","physical","fire"], verified:true, note:"Sensível a Energy, Ice e Holy. Cospe Earth/Physical/Fire.",
                        freq:{energywave:40,energybeam:35,rage:25}}
   },
   "Soul War":{
@@ -413,7 +457,6 @@ function readState(){
   let gemDH=0;
   for(const g of GEMS){
     const v=(parseFloat(g.value)||0)/100;
-    if(g.type==="dh"){ gemDH+=(parseFloat(g.value)||0); continue; }
     if(!SPELLS[g.spell]) continue;
     if(g.type==="base") gBase[g.spell]+=v;
     else if(g.type==="cdmg") ES[g.spell]+=v;
@@ -461,10 +504,12 @@ function readState(){
   if(mult<=0) mult=10.5;
 
   const ml=Math.max(num("ml"),1), L=Math.max(num("level"),1);
+  const mlSkill=Math.max(num("mlbase"),0)*(1+Math.max(num("loy"),0)/100);
   const B=baseFromLevel(L)+Math.max(num("wdmg"),0)+gemDH;
 
   return {
-    L, ml, B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH, beamGain, bmLvl,
+    L, ml, mlSkill, mlRatio: ml>0 ? mlSkill/ml : 0,
+    B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH, beamGain, bmLvl,
     p:pBase, E:EBase,
     procmode:document.getElementById("procmode").value,
     w:(mult*ml)/(mult*ml+B),
@@ -491,8 +536,10 @@ function value(o,S){
     case "boss":       return 0;
     case "pierce":{
       const Sv=S.sens[o.el];
-      if(Sv<=0) return 0;
-      return S.elDmg[o.el]*((Sv>100?o.v/2:o.v)/Sv)*100;
+      if(Sv<=0) return 0;                              // sensibilidade 0 nunca sobe
+      const add=Sv>100 ? o.v/2 : o.v;                  // metade acima de 100%
+      const eff=Math.min(add,Sv);                      // nunca pode dobrar a sensibilidade
+      return S.elDmg[o.el]*(eff/Sv)*100;
     }
     case "homing":{
       let rolls=0, dmg=0;
@@ -512,7 +559,8 @@ function poolOptions(S){
   const main=Object.keys(SPELLS).reduce((a,b)=>S.share[a]>=S.share[b]?a:b);
   const den=1+S.pS[main]*S.ES[main];
   return [
-    {label:"+8% da maior skill de combate como dano extra nas magias", v:8*S.w, note:"neutro, pega toda a rotação"},
+    {label:"+8% da maior skill de combate como dano extra nas magias", v:8*S.w*S.mlRatio,
+     note:`conta ML treinado + loyalty (${S.mlSkill.toFixed(0)} de ${S.ml}), não o total`},
     {label:"+20% crit extra damage — "+SPELLS[main].label, v:S.share[main]*S.pS[main]*20/den, note:"só na magia principal"},
     {label:"+2,5% de dano contra a classe do bestiário", v:2.5*S.bclass, note:"só na fatia da spawn dessa classe"},
     {label:"+3% dano base — "+SPELLS[main].label, v:3*S.share[main], note:"só na magia principal"},
@@ -525,6 +573,52 @@ function poolOptions(S){
 
 let currentTree="coil";
 const fmt=v=>(v>=0?"+":"")+v.toFixed(2)+"%";
+
+function renderGear(){
+  const box=document.getElementById("gear");
+  if(!GEAR.length){ box.innerHTML='<p class="hint" style="margin-top:0">Nenhuma peça lançada.</p>'; }
+  else box.innerHTML=GEAR.map((g,i)=>`<div class="gear-row">
+    <select data-gi="${i}" data-gf="slot">${SLOTS.map(s=>`<option ${g.slot===s?"selected":""}>${s}</option>`).join("")}</select>
+    <input type="text" data-gi="${i}" data-gf="name" value="${(g.name||"").replace(/"/g,"&quot;")}" placeholder="nome da peça">
+    <input type="number" data-gi="${i}" data-gf="tier" value="${g.tier}" min="0" max="12" aria-label="tier">
+    <input type="number" data-gi="${i}" data-gf="ml" value="${g.ml}" min="0" aria-label="magic level">
+    <input type="number" data-gi="${i}" data-gf="imb" value="${g.imb}" min="0" max="3" aria-label="slots de imbuement">
+    <button type="button" class="x" data-gdel="${i}" aria-label="remover">×</button>
+  </div>`).join("");
+
+  const ml=GEAR.reduce((a,g)=>a+(+g.ml||0),0), imb=GEAR.reduce((a,g)=>a+(+g.imb||0),0);
+  const mech=GEAR.filter(g=>TIER_MECH[g.slot]&&+g.tier>0)
+                 .map(g=>`${TIER_MECH[g.slot]} T${g.tier}`).join(" · ");
+  document.getElementById("gearSum").textContent=
+    `${GEAR.length} peça(s) · +${ml} de ML · ${imb} slot(s) de imbuement${mech?" · "+mech:""}`;
+}
+
+function renderAdvice(){
+  const d=REGIONS[document.getElementById("region").value][document.getElementById("hunt").value];
+  const box=document.getElementById("advice");
+  const imb=GEAR.reduce((a,g)=>a+(+g.imb||0),0);
+
+  if(!d || !d.weak){
+    box.innerHTML=`<div class="warn">Não tenho as fraquezas nem os elementos de dano desta área confirmados, então não dá para recomendar charm nem proteção sem inventar. Abra o Bestiary de uma criatura da spawn: a lista de <i>weak to</i> te dá o charm e a de dano que ela causa te dá a proteção.</div>`;
+    return;
+  }
+
+  const charms=d.weak.map((e,i)=>
+    `<div class="adv-row"><span class="k">${i===0?"▸":"○"} ${CHARM[e]||"—"}</span><span class="d">explora a fraqueza a ${e}</span></div>`).join("");
+  const prots=d.deals.map(e=>
+    `<div class="adv-row"><span class="k">${PROT[e]||"—"}</span><span class="d">o bicho bate ${e}${e==="physical"?" — sem imbuement de proteção, resolve com armadura":""}</span></div>`).join("");
+
+  box.innerHTML=`
+    <h3 class="sec" style="margin-top:0;border-top:0;padding-top:0">Charm ofensivo</h3>
+    ${charms}
+    <p class="hint">Charm de dano bate uma fatia da vida máxima do bicho no elemento do charm, então quem manda é a fraqueza dele, não a sua rotação. O primeiro da lista é a fraqueza mais citada da área. Lembrando que o <b>pierce não soma no dano de charm</b>.</p>
+    <h3 class="sec">Proteções sugeridas</h3>
+    ${prots}
+    <h3 class="sec">Sustentação</h3>
+    <div class="adv-row"><span class="k">Void</span><span class="d">mana leech — praticamente obrigatório numa rotação de spam</span></div>
+    <div class="adv-row"><span class="k">Vampirism</span><span class="d">life leech — troque por uma proteção se o pull estiver seguro</span></div>
+    <p class="hint" style="margin-bottom:0">Você declarou <b>${imb} slot(s)</b> de imbuement no equipamento. Com o padrão de mago, priorize Void, depois a proteção do elemento que mais dói, e só então a segunda proteção ou Vampirism. Isto é uma heurística montada a partir dos elementos que a área usa — não é uma tabela testada de custo-benefício por hunt.</p>`;
+}
 
 function renderStance(S){
   const sb=S.sb;
@@ -541,6 +635,7 @@ function renderStance(S){
 function render(){
   const S=readState();
   renderStance(S);
+  renderAdvice();
   document.getElementById("bTotal").textContent=S.B+(S.gemDH?"  (gemas +"+S.gemDH+")":"");
 
   const beams=Object.keys(SPELLS).filter(k=>SPELLS[k].beam);
@@ -578,7 +673,7 @@ function render(){
 
   document.getElementById("oW").textContent=S.w.toFixed(3);
   document.getElementById("oB").textContent=S.B;
-  document.getElementById("oSkill").textContent=fmt(8*S.w);
+  document.getElementById("oSkill").textContent=fmt(8*S.w*S.mlRatio);
   document.getElementById("oNet").textContent=fmt(net);
 
   document.getElementById("ladder").innerHTML=per.map(({i,vals,top})=>{
@@ -606,12 +701,12 @@ function render(){
 
 /* ---------------- presets ---------------- */
 
-const P_NUM=["level","ml","crit","cdmg","bclass","sFire","sEnergy","sDeath","wdmg"];
+const P_NUM=["level","ml","mlbase","loy","crit","cdmg","bclass","sFire","sEnergy","sDeath","wdmg"];
 const P_SEL=["region","hunt","stance","qSE","qSD","qNE","qND","procmode"];
 const STORE_KEY="perkcalc.preset.v1";
 
 function collectPreset(){
-  const o={v:1, num:{}, sel:{}, convert:document.getElementById("convert").checked, rot:{}, gems:GEMS};
+  const o={v:2, num:{}, sel:{}, convert:document.getElementById("convert").checked, rot:{}, gems:GEMS, gear:GEAR};
   P_NUM.forEach(i=>o.num[i]=document.getElementById(i).value);
   P_SEL.forEach(i=>o.sel[i]=document.getElementById(i).value);
   for(const k in SPELLS) o.rot[k]={fq:document.getElementById("fq_"+k).value, tg:document.getElementById("tg_"+k).value};
@@ -642,7 +737,8 @@ function applyPreset(o){
     document.getElementById("tg_"+k).value=o.rot[k].tg;
   }
   GEMS=Array.isArray(o.gems)?o.gems.filter(g=>g&&GEM_TYPES[g.type]):[];
-  renderGems(); freqSum(); render();
+  GEAR=Array.isArray(o.gear)?o.gear:[];
+  renderGems(); renderGear(); freqSum(); render();
 }
 
 function status(msg,cls){
@@ -707,7 +803,7 @@ function renderGems(){
   const box=document.getElementById("gems");
   if(!GEMS.length){ box.innerHTML='<p class="hint" style="margin-top:0">Nada lançado ainda.</p>'; return; }
   box.innerHTML=GEMS.map((g,i)=>`<div class="gem-row">
-    <select data-i="${i}" data-f="spell" ${g.type==="dh"?"disabled":""}>${Object.entries(SPELLS).map(([k,s])=>`<option value="${k}" ${g.spell===k?"selected":""}>${s.label}</option>`).join("")}</select>
+    <select data-i="${i}" data-f="spell">${Object.entries(SPELLS).map(([k,s])=>`<option value="${k}" ${g.spell===k?"selected":""}>${s.label}</option>`).join("")}</select>
     <select data-i="${i}" data-f="type">${Object.entries(GEM_TYPES).map(([k,v])=>`<option value="${k}" ${g.type===k?"selected":""}>${v}</option>`).join("")}</select>
     <input type="number" data-i="${i}" data-f="value" value="${g.value}" step="0.5" aria-label="valor">
     <button type="button" class="x" data-del="${i}" aria-label="remover">×</button>
@@ -760,8 +856,15 @@ function switchTab(t){
 function init(){
   buildRotation();
   renderGems();
+  renderGear();
   buildHunts();
 
+  const gearEdit=t=>{
+    if(!t.dataset || t.dataset.gf===undefined) return false;
+    const f=t.dataset.gf;
+    GEAR[t.dataset.gi][f]= (f==="name"||f==="slot") ? t.value : (parseFloat(t.value)||0);
+    renderGear(); render(); return true;
+  };
   const gemEdit=t=>{
     if(!t.dataset || t.dataset.f===undefined) return false;
     GEMS[t.dataset.i][t.dataset.f]= t.dataset.f==="value" ? (parseFloat(t.value)||0) : t.value;
@@ -769,18 +872,26 @@ function init(){
     render(); return true;
   };
   document.addEventListener("input",e=>{
+    if(gearEdit(e.target)) return;
     if(gemEdit(e.target)) return;
     if(e.target.tagName==="INPUT"){ freqSum(); render(); }
   });
   document.addEventListener("change",e=>{
+    if(gearEdit(e.target)) return;
     if(gemEdit(e.target)) return;
     if(["stance","qSE","qND","procmode","convert"].includes(e.target.id)) render();
   });
   document.addEventListener("click",e=>{
     const d=e.target.dataset ? e.target.dataset.del : undefined;
-    if(d!==undefined){ GEMS.splice(+d,1); renderGems(); render(); }
+    if(d!==undefined){ GEMS.splice(+d,1); renderGems(); render(); return; }
+    const gd=e.target.dataset ? e.target.dataset.gdel : undefined;
+    if(gd!==undefined){ GEAR.splice(+gd,1); renderGear(); render(); }
   });
 
+  document.getElementById("addgear").addEventListener("click",()=>{
+    GEAR.push({slot:"Helmet",name:"",tier:0,ml:0,imb:2});
+    renderGear(); render();
+  });
   document.getElementById("addgem").addEventListener("click",()=>{
     GEMS.push({spell:"gfw",type:"base",value:5});
     renderGems(); render();
