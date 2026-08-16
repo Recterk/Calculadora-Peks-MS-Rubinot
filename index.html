@@ -12,52 +12,72 @@
   --void:#0F141A; --slab:#161E26; --slab2:#1C262F; --line:#2A3742;
   --sanguine:#B0323C; --sanguine-dim:#6E2028;
   --moonsilver:#A8C4DA; --moonsilver-dim:#5A7286;
-  --bone:#E8E0D0; --ash:#8695A2; --gild:#D2A24C;
-  --ok:#6FA88B;
+  --bone:#E8E0D0; --ash:#8695A2; --gild:#D2A24C; --ok:#6FA88B;
+  --fire:#C97A46; --energy:#8E7FD0; --death:#7E8C99;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{
-  background:var(--void); color:var(--bone);
-  font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:15px; line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
+body{background:var(--void);color:var(--bone);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 80px}
 
-/* ---- header ---- */
 header{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash)}
-h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(24px,4.6vw,40px);line-height:1.1;margin:10px 0 8px;letter-spacing:.01em}
+h1{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(24px,4.6vw,40px);line-height:1.1;margin:10px 0 8px}
 h1 .amp{color:var(--sanguine)}
 .sub{color:var(--ash);max-width:62ch;font-size:14px;margin:0}
 
-.layout{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.layout{display:grid;grid-template-columns:330px 1fr;gap:26px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
 
-/* ---- panels ---- */
 .panel{background:var(--slab);border:1px solid var(--line);border-radius:3px;padding:18px}
 .panel + .panel{margin-top:16px}
 aside{position:sticky;top:20px}
-@media(max-width:900px){aside{position:static}}
+@media(max-width:980px){aside{position:static}}
 .panel h2{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ash);margin:0 0 14px;font-weight:600}
+.panel h3.sec{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--moonsilver-dim);margin:18px 0 10px;font-weight:600;border-top:1px solid var(--line);padding-top:14px}
 
 .field{margin-bottom:12px}
 .field label{display:block;font-size:12px;color:var(--ash);margin-bottom:4px}
-input[type=number],select{
-  width:100%;background:var(--void);border:1px solid var(--line);color:var(--bone);
-  font-family:'IBM Plex Mono',monospace;font-size:14px;padding:8px 9px;border-radius:2px;
-}
+input[type=number],select{width:100%;background:var(--void);border:1px solid var(--line);color:var(--bone);font-family:'IBM Plex Mono',monospace;font-size:14px;padding:8px 9px;border-radius:2px}
+select{font-family:'IBM Plex Sans',sans-serif}
+select:disabled{opacity:.35}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gild);outline-offset:1px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11.5px;color:var(--ash);margin:6px 0 14px;line-height:1.45}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ash);margin-bottom:12px}
+.check input{width:auto;margin-top:3px}
 
-.rot-head{display:grid;grid-template-columns:1fr 58px 50px;gap:8px;margin-bottom:6px}
-.rot-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash);text-align:center}
-.rot-row{display:grid;grid-template-columns:1fr 58px 50px;gap:8px;align-items:center;margin-bottom:6px}
-.rot-row span{font-size:13px}
-.rot-row em{font-style:normal;color:var(--ash);font-size:11px;font-family:'IBM Plex Mono',monospace}
-.rot-row input{padding:7px 6px;text-align:center}
-.sum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ash);margin-top:8px;display:flex;justify-content:space-between}
+button.ghost{background:transparent;border:1px dashed var(--line);color:var(--ash);font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;padding:8px 12px;border-radius:2px;cursor:pointer;width:100%}
+button.ghost:hover{color:var(--bone);border-color:var(--moonsilver-dim)}
+button.x{background:transparent;border:0;color:var(--ash);cursor:pointer;font-size:16px;line-height:1;padding:6px}
+button.x:hover{color:var(--sanguine)}
+
+.stance-out{border:1px solid var(--line);border-radius:2px;padding:11px 12px;background:#121920;font-size:12.5px;line-height:1.6}
+.stance-out .l{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash);display:block;margin-bottom:5px}
+.stance-out b{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.stance-out .fire b{color:var(--fire)} .stance-out .energy b{color:var(--energy)} .stance-out .death b{color:var(--death)}
+.stance-out .off{color:var(--ash);opacity:.45}
+
+.gem-row{display:grid;grid-template-columns:1fr 150px 74px 30px;gap:7px;align-items:center;margin-bottom:7px}
+@media(max-width:620px){.gem-row{grid-template-columns:1fr 1fr;gap:6px}}
+.gem-row select,.gem-row input{font-size:12.5px;padding:6px 7px}
+
+.rot-grid{display:grid;grid-template-columns:1fr 80px 80px 88px 82px;gap:8px;align-items:center}
+@media(max-width:620px){.rot-grid{grid-template-columns:1fr 52px 48px 56px 58px;gap:5px}}
+.rot-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);text-align:center;line-height:1.3}
+.rot-head span:first-child{text-align:left}
+.rot-head span.calc{color:var(--moonsilver-dim)}
+.rot-row{margin-top:6px}
+.rot-row .spell{font-size:13.5px;line-height:1.25}
+.rot-row .spell em{display:block;font-style:normal;color:var(--ash);font-size:11px;font-family:'IBM Plex Mono',monospace}
+.rot-row .spell em.st{color:var(--gild)}
+.rot-row input{padding:7px 4px;text-align:center}
+.out{font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;padding:7px 4px;background:#121920;border-radius:2px;color:var(--moonsilver)}
+.out.zero{color:var(--ash);opacity:.45}
+.out.boosted{color:var(--gild);box-shadow:inset 0 0 0 1px #4A3D22}
+.sum{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ash);margin-top:10px;display:flex;justify-content:space-between;gap:10px}
 .sum.bad{color:var(--sanguine)}
 
 .badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid var(--line);color:var(--ash)}
@@ -65,16 +85,11 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .badge.unverified{color:var(--gild);border-color:#4A3D22}
 .warn{background:#241C10;border:1px solid #4A3D22;color:#E0CFA6;font-size:12px;padding:9px 10px;border-radius:2px;margin-top:10px;line-height:1.45}
 
-/* ---- weapon tabs ---- */
-.tabs{display:flex;gap:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:18px}
-.tabs button{
-  flex:1;background:var(--slab);border:0;color:var(--ash);cursor:pointer;
-  font-family:'Cinzel',serif;font-weight:500;font-size:13px;padding:12px 8px;letter-spacing:.04em;
-}
+.tabs{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin:16px 0}
+.tabs button{flex:1;background:var(--slab);border:0;color:var(--ash);cursor:pointer;font-family:'Cinzel',serif;font-weight:500;font-size:13px;padding:12px 8px}
 .tabs button[aria-selected=true]{background:var(--slab2);color:var(--bone);box-shadow:inset 0 -2px 0 var(--sanguine)}
 .tabs button:nth-child(2)[aria-selected=true]{box-shadow:inset 0 -2px 0 var(--moonsilver)}
 
-/* ---- summary ---- */
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;margin-bottom:20px}
 @media(max-width:640px){.summary{grid-template-columns:1fr 1fr}}
 .stat{background:var(--slab);padding:13px 14px}
@@ -82,18 +97,12 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .stat .v{font-family:'IBM Plex Mono',monospace;font-size:20px;margin-top:3px}
 .stat .v.gain{color:var(--ok)}
 
-/* ---- the ladder (signature) ---- */
-.ladder{border-left:1px solid var(--line);margin-left:19px;padding-left:0}
+.ladder{border-left:1px solid var(--line);margin-left:19px}
 .rung{position:relative;padding:0 0 4px 30px;margin-bottom:16px}
-.rung::before{
-  content:attr(data-n);position:absolute;left:-19px;top:0;width:38px;height:38px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Cinzel',serif;font-weight:700;font-size:13px;
-  background:var(--void);border:1px solid var(--line);border-radius:50%;color:var(--ash);
-}
+.rung::before{content:attr(data-n);position:absolute;left:-19px;top:0;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;font-size:13px;background:var(--void);border:1px solid var(--line);border-radius:50%;color:var(--ash)}
 .rung.shape::before{border-color:var(--sanguine);color:var(--sanguine);border-style:dashed}
 .rung .head{display:flex;align-items:center;gap:10px;min-height:38px;flex-wrap:wrap}
-.rung .head h3{font-size:13px;margin:0;font-weight:600;letter-spacing:.02em}
+.rung .head h3{font-size:13px;margin:0;font-weight:600}
 .opts{margin-top:8px;border:1px solid var(--line);border-radius:3px;overflow:hidden}
 .opt{display:grid;grid-template-columns:1fr 78px;gap:10px;align-items:center;padding:9px 12px;background:var(--slab);border-top:1px solid var(--line);font-size:13.5px}
 .opt:first-child{border-top:0}
@@ -117,7 +126,6 @@ footer b{color:var(--bone);font-weight:600}
 details summary{cursor:pointer;color:var(--ash);font-size:12px;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
 details[open] summary{margin-bottom:10px}
 code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver)}
-@media(prefers-reduced-motion:no-preference){.opt{transition:background .12s ease}}
 </style>
 </head>
 <body>
@@ -140,13 +148,20 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       <div class="field"><label for="crit">Crit chance %</label><input type="number" id="crit" value="20" step="0.5" min="0"></div>
       <div class="field"><label for="cdmg">Crit extra damage %</label><input type="number" id="cdmg" value="60" step="1" min="0"></div>
     </div>
-    <div class="field"><label for="bclass">Bestiário: % da spawn na classe</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
+    <p class="hint">Totais da Cyclopedia <b>sem a stance ativa</b> — o bônus da stance é somado aqui embaixo, por magia, para não contar duas vezes.</p>
+    <div class="field" style="margin-bottom:0"><label for="bclass">Bestiário: % da spawn na classe</label><input type="number" id="bclass" value="60" min="0" max="100"></div>
   </div>
 
   <div class="panel">
     <h2>Hunt</h2>
     <div class="field"><label for="region">Região</label><select id="region"></select></div>
     <div class="field"><label for="hunt">Hunt</label><select id="hunt"></select></div>
+    <div class="field"><label for="stance">Instância elemental nesta hunt</label>
+      <select id="stance">
+        <option value="fire">Fire</option><option value="energy">Energy</option>
+        <option value="death">Death</option><option value="none">Nenhuma</option>
+      </select></div>
+    <label class="check"><input type="checkbox" id="convert"><span>A stance converte o dano das outras magias para o elemento dela (afeta só a sensibilidade e o pierce)</span></label>
     <div id="huntmeta"></div>
     <div class="field" style="margin-top:14px"><label>Sensibilidade do bicho (%)</label>
       <div class="grid3">
@@ -156,21 +171,51 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
       </div>
     </div>
   </div>
-
-  <div class="panel">
-    <h2>Rotação</h2>
-    <div class="rot-head"><span></span><span>% dano</span><span>alvos</span></div>
-    <div id="rot"></div>
-    <div class="sum" id="rotsum"><span>Soma</span><span id="rotval">100%</span></div>
-    <div class="field" style="margin-top:14px"><label for="procmode">Homing missile do N3 dispara</label>
-      <select id="procmode">
-        <option value="cast">1% por cast</option>
-        <option value="target">1% por alvo atingido</option>
-      </select></div>
-  </div>
 </aside>
 
 <main>
+  <div class="panel">
+    <h2>Roda de Destino</h2>
+
+    <h3 class="sec" style="margin-top:0;border-top:0;padding-top:0">Nível de cada lado</h3>
+    <div class="grid4">
+      <div class="field"><label for="qSE">Sul-Esquerda — Lord of Destruction</label>
+        <select id="qSE"><option value="0">Nv 0 — sem revelation</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3" selected>Nv 3</option></select></div>
+      <div class="field"><label for="qSD">Sul-Direita</label>
+        <select id="qSD"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
+      <div class="field"><label for="qNE">Norte-Esquerda</label>
+        <select id="qNE"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
+      <div class="field"><label for="qND">Norte-Direita</label>
+        <select id="qND"><option value="0">Nv 0</option><option value="1">Nv 1</option><option value="2">Nv 2</option><option value="3">Nv 3</option></select></div>
+    </div>
+    <p class="hint">Só o Sul-Esquerda entra na conta, porque é onde mora o Lord of Destruction. Os outros três ficam de registro — não tenho a tabela que converte pontos de roda em damage and healing, então esse número você lê da roda e digita abaixo.</p>
+
+    <h3 class="sec">Stance ativa — o que ela está somando</h3>
+    <div class="stance-out" id="stanceOut"></div>
+
+    <h3 class="sec">Damage and healing</h3>
+    <div class="grid2">
+      <div class="field"><label for="wdmg">Pontos vindos da roda</label><input type="number" id="wdmg" value="0" min="0"></div>
+      <div class="field"><label>Total no cálculo (level + roda + gemas)</label><div class="out" id="bTotal" style="text-align:left;padding:8px 9px">—</div></div>
+    </div>
+
+    <h3 class="sec">Gemas e perks de magia</h3>
+    <div id="gems"></div>
+    <button type="button" id="addgem" class="ghost">+ adicionar modificador</button>
+    <p class="hint" style="margin-bottom:0">Lance uma linha por efeito. Se uma gema tem três modificadores, são três linhas. Efeitos gerais que já aparecem na Cyclopedia (crit chance e crit extra damage globais) não entram aqui — eles já estão nos campos do painel Personagem.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Rotação</h2>
+    <div class="rot-grid rot-head">
+      <span>Magia</span><span>% na rotação</span><span>Alvos por cast</span><span class="calc">Base power</span><span class="calc">% dano</span>
+    </div>
+    <div id="rot"></div>
+    <div class="sum" id="rotsum"><span>Soma de % na rotação</span><span id="rotval">100%</span></div>
+    <div class="field" style="margin-top:14px;max-width:300px"><label for="procmode">Homing missile do N3 dispara</label>
+      <select id="procmode"><option value="cast">1% por cast</option><option value="target">1% por alvo atingido</option></select></div>
+  </div>
+
   <div class="tabs" role="tablist">
     <button role="tab" id="tab-coil" aria-selected="true">Grand Sanguine Coil</button>
     <button role="tab" id="tab-stellar" aria-selected="false">Stellar Moonsilver Channeler</button>
@@ -178,7 +223,7 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
 
   <div class="summary">
     <div class="stat"><div class="k">Parcela de ML (w)</div><div class="v" id="oW">—</div></div>
-    <div class="stat"><div class="k">Dano-base do level</div><div class="v" id="oB">—</div></div>
+    <div class="stat"><div class="k">Dano-base total</div><div class="v" id="oB">—</div></div>
     <div class="stat"><div class="k">Perk de skill (rank 10)</div><div class="v" id="oSkill">—</div></div>
     <div class="stat"><div class="k">Ganho das 2 trocas</div><div class="v gain" id="oNet">—</div></div>
   </div>
@@ -188,11 +233,15 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
   <footer>
     <details>
       <summary>Como as contas são feitas</summary>
-      <p><b>Dano médio</b> = D × (1 + p·E). <b>w</b> = mult·ML / (mult·ML + B), onde B é o dano-base que vem do level (+1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500) e mult é o multiplicador médio de ML da sua rotação.</p>
-      <p><code>crit extra +y%</code> = fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w &nbsp;·&nbsp; <code>dano base +z%</code> = z · fatia da magia.</p>
-      <p><b>Pierce</b> soma pontos na sensibilidade do alvo, e o ganho é ΔS/S. O acréscimo cai pela metade acima de 100% e nunca sobe sensibilidade 0%. Por isso ele rende menos justamente contra bicho fraco ao seu elemento.</p>
-      <p><b>Alvos por cast</b> só entram na conta do homing missile (N3 da Channeler), porque todos os outros perks são multiplicativos e o tamanho do pull se cancela. Se o proc for por cast, o ganho é 0,03·Level · Σ(fatia da magia ÷ dano por cast dela) — magia que pega muito alvo dilui o proc. Se for por alvo atingido, o tamanho do pull deixa de importar. Não sei qual das duas o jogo usa, por isso o seletor.</p>
-      <p><b>Multiplicadores de ML</b> — Hell's Core 10,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki. Great Fire Wave, Death Echo e Great Death Beam são posteriores ao rebalanceamento e estão <b>estimados</b> (marcados com ~).</p>
+      <p><b>Elemental stances.</b> A promoção já dá +4% base power para magias de fire, +4% crit hit chance para magias de energy e +30% crit extra damage para magias de death, conforme a stance ativa. O <b>Lord of Destruction</b> (Sul-Esquerda) soma +2/3/4 pontos nas duas primeiras e +15/22,5/30 na terceira, chegando a 8%, 8% e 60% no Nv 3. Stances valem só para <b>magias</b>: a Sudden Death, por ser runa, fica de fora.</p>
+      <p><b>Base power</b> é calculado. Ele parte do valor da magia e recebe, nesta ordem: perks de base damage (multiplicam direto), perks de crítico convertidos para dano médio pela razão (1 + p'·E') ÷ (1 + p·E), e a sensibilidade do bicho ao elemento daquele dano.</p>
+      <p><b>% dano</b> = <code>% na rotação × alvos × base power</code>, normalizado para 100. É o peso real de cada magia e pondera todo perk elemental ou de magia específica.</p>
+      <p><b>Damage and healing</b> soma no mesmo lugar que o dano-base do level: <code>B = B(level) + roda + gemas</code>. Como o w é <code>mult·ML ÷ (mult·ML + B)</code>, esses pontos <i>reduzem</i> o w e, com ele, o valor do perk de % da skill. B(level): +1 a cada 5 levels até 500, a cada 6 até 1100, a cada 7 até 1800, a cada 8 até 2600, a cada 9 até 3500.</p>
+      <p><code>crit extra +y%</code> = Σ fatia · p·y/(1+p·E) &nbsp;·&nbsp; <code>crit chance +x%</code> = Σ fatia · x·E/(1+p·E) &nbsp;·&nbsp; <code>+N Magic Level</code> = N·w/ML &nbsp;·&nbsp; <code>% da skill</code> = 0,08·w. As somas correm magia a magia, com o p e o E de cada uma — então a stance de death, que infla o E das magias de death, já derruba sozinha o valor de somar mais crit extra damage nelas.</p>
+      <p><b>Perks elementais da árvore</b> são calculados pelo elemento <b>nativo</b> da magia. Se o seu servidor faz o bônus seguir o elemento convertido, o resultado muda — é a dúvida que o marcador de conversão não resolve, porque ele só reencaminha sensibilidade e pierce.</p>
+      <p><b>Pierce</b> soma pontos na sensibilidade do alvo e o ganho é ΔS/S. O acréscimo cai pela metade acima de 100% e nunca sobe sensibilidade 0%.</p>
+      <p><b>Fora da conta de propósito:</b> Focus Mastery e outros bônus que multiplicam o dano inteiro por igual. Eles mudam quanto você bate, mas não mudam qual perk é melhor — saem na divisão.</p>
+      <p><b>Multiplicador de ML</b> (define o w, não confundir com base power): Hell's Core 10,5, Rage of the Skies 8,5, Energy Wave 6,75, Great Energy Beam 5,5 e Sudden Death 6,0 vêm das fórmulas observadas na TibiaWiki; Great Fire Wave, Death Echo e Great Death Beam são <b>estimados</b> (marcados com ~).</p>
       <p><b>Rubinot é OT.</b> Fórmulas de dano, crit e a implementação da proficiência podem divergir do global. Confirme na Cyclopedia e no Bestiary antes de gastar dust.</p>
     </details>
   </footer>
@@ -203,30 +252,43 @@ code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--moonsilver
 <script>
 "use strict";
 
-/* ---------------- dados ---------------- */
-
 const SPELLS = {
-  hellscore:   {label:"Hell's Core",        el:"fire",   mult:10.5, src:true,  tg:6},
-  gfw:         {label:"Great Fire Wave",    el:"fire",   mult:9.0,  src:false, tg:4},
-  energywave:  {label:"Energy Wave",        el:"energy", mult:6.75, src:true,  tg:4},
-  energybeam:  {label:"Great Energy Beam",  el:"energy", mult:5.5,  src:true,  tg:3},
-  deathecho:   {label:"Death Echo",         el:"death",  mult:8.0,  src:false, tg:5},
-  deathbeam:   {label:"Great Death Beam",   el:"death",  mult:5.5,  src:false, tg:3},
-  sd:          {label:"Sudden Death (runa)",el:"death",  mult:6.0,  src:true,  tg:1}
+  hellscore:  {label:"Hell's Core",       alias:"mas flam",       el:"fire",   mult:10.5, src:true,  power:250, tg:6},
+  gfw:        {label:"Great Fire Wave",   alias:"grand flam hur", el:"fire",   mult:9.0,  src:false, power:100, tg:4},
+  rage:       {label:"Rage of the Skies", alias:"mas vis",        el:"energy", mult:8.5,  src:true,  power:200, tg:6},
+  energywave: {label:"Energy Wave",       alias:"vis hur",        el:"energy", mult:6.75, src:true,  power:150, tg:4},
+  energybeam: {label:"Great Energy Beam", alias:"vis lux",        el:"energy", mult:5.5,  src:true,  power:155, tg:3},
+  deathbeam:  {label:"Great Death Beam",  alias:"max mort",       el:"death",  mult:5.5,  src:false, power:155, tg:3},
+  deathecho:  {label:"Death Echo",        alias:"death eco",      el:"death",  mult:8.0,  src:false, power:75,  tg:5},
+  sd:         {label:"Sudden Death",      alias:"runa · power ~", el:"death",  mult:6.0,  src:true,  power:130, tg:1, rune:true}
 };
 
-// sens: sensibilidade em % (100 = neutro, >100 = fraco, <100 = resistente)
-// verified: a lista "sensitive to" da área está documentada; os VALORES continuam sendo estimativa.
+// stance base (promoção) + extensão do Lord of Destruction por nível do Sul-Esquerda
+const STANCE = {
+  fire:   {base:4,  lod:[0,2,3,4],       stat:"base power",        key:"base"},
+  energy: {base:4,  lod:[0,2,3,4],       stat:"crit hit chance",   key:"cchance"},
+  death:  {base:30, lod:[0,15,22.5,30],  stat:"crit extra damage", key:"cdmg"}
+};
+
+const GEM_TYPES = {
+  base:    "base damage (magia)",
+  cdmg:    "crit extra damage (magia)",
+  cchance: "crit hit chance (magia)",
+  dh:      "damage and healing (pontos)"
+};
+
+let GEMS = [];
+
 const REGIONS = {
   "Rotten Blood":{
-    "Putrefactory":   {sens:{fire:110,energy:90,death:90},  verified:true, note:"Sensível a Holy, Earth e Fire. Cospe Death/Ice/Energy.",
-                       rot:{hellscore:50,gfw:50}},
-    "Darklight Core": {sens:{fire:110,energy:90,death:100}, verified:true, note:"Sensível a Earth, Fire e Physical. Cospe Energy/Physical/Ice.",
-                       rot:{hellscore:45,gfw:40,deathecho:15}},
-    "Gloom Pillars":  {sens:{fire:90,energy:110,death:110}, verified:true, note:"Sensível a Physical, Death e Energy. Cospe Holy/Fire/Earth.",
-                       rot:{deathecho:35,deathbeam:30,energywave:35}},
-    "Jaded Roots":    {sens:{fire:90,energy:110,death:100}, verified:true, note:"Sensível a Energy, Ice e Holy. Cospe Earth/Physical/Fire.",
-                       rot:{energywave:55,energybeam:45}}
+    "Putrefactory":   {sens:{fire:110,energy:90,death:90},  stance:"fire",   verified:true, note:"Sensível a Holy, Earth e Fire. Cospe Death/Ice/Energy.",
+                       freq:{gfw:65,hellscore:35}},
+    "Darklight Core": {sens:{fire:110,energy:90,death:100}, stance:"fire",   verified:true, note:"Sensível a Earth, Fire e Physical. Cospe Energy/Physical/Ice.",
+                       freq:{gfw:55,hellscore:25,deathecho:20}},
+    "Gloom Pillars":  {sens:{fire:90,energy:110,death:110}, stance:"death",  verified:true, note:"Sensível a Physical, Death e Energy. Cospe Holy/Fire/Earth.",
+                       freq:{deathecho:30,deathbeam:25,energywave:25,rage:20}},
+    "Jaded Roots":    {sens:{fire:90,energy:110,death:100}, stance:"energy", verified:true, note:"Sensível a Energy, Ice e Holy. Cospe Earth/Physical/Fire.",
+                       freq:{energywave:40,energybeam:35,rage:25}}
   },
   "Soul War":{
     "Claustrophobic Inferno":{sens:{fire:100,energy:100,death:100}, verified:false},
@@ -247,12 +309,10 @@ const REGIONS = {
   }
 };
 
-const DEFAULT_ROT = {hellscore:35,gfw:25,deathecho:20,deathbeam:20};
+const DEFAULT_FREQ = {gfw:40,hellscore:20,deathecho:25,deathbeam:15};
 
-/* árvores — cada opção vira um valor calculado */
 const TREES = {
   coil:{
-    name:"Grand Sanguine Coil",
     levels:[
       [{t:"ml",n:1,label:"+1 Magic Level"}],
       [{t:"critExtra",y:10,el:"energy",label:"+10% crit extra damage — Energy"},
@@ -272,7 +332,6 @@ const TREES = {
     ]
   },
   stellar:{
-    name:"Stellar Moonsilver Channeler",
     levels:[
       [{t:"critExtra",y:12,label:"+12% crit extra damage"}],
       [{t:"bestiary",v:3,label:"+3% dano contra Human"},
@@ -307,63 +366,108 @@ function baseFromLevel(L){
   return B;
 }
 
+function stanceBonus(){
+  const st=document.getElementById("stance").value;
+  const lod=parseInt(document.getElementById("qSE").value,10)||0;
+  if(st==="none"||!STANCE[st]) return {el:null,amount:0,key:null,lod:lod};
+  const s=STANCE[st];
+  return {el:st, amount:s.base+s.lod[lod], key:s.key, stat:s.stat, base:s.base, extra:s.lod[lod], lod:lod};
+}
+
 function readState(){
   const num=id=>parseFloat(document.getElementById(id).value)||0;
-  const rot={}, tg={}; let tot=0;
-  for(const k in SPELLS){ rot[k]=num("rot_"+k); tg[k]=Math.max(num("tg_"+k),1); tot+=rot[k]; }
-  const share={}; for(const k in SPELLS) share[k]= tot>0 ? rot[k]/tot : 0;
+  const pBase=num("crit")/100, EBase=num("cdmg")/100, denBase=1+pBase*EBase;
+  const sb=stanceBonus();
+  const convert=document.getElementById("convert").checked;
 
-  const el={fire:0,energy:0,death:0};
-  for(const k in SPELLS) el[SPELLS[k].el]+=share[k];
+  const pS={}, ES={}, gBase={};
+  for(const k in SPELLS){ pS[k]=pBase; ES[k]=EBase; gBase[k]=0; }
+
+  let gemDH=0;
+  for(const g of GEMS){
+    const v=(parseFloat(g.value)||0)/100;
+    if(g.type==="dh"){ gemDH+=(parseFloat(g.value)||0); continue; }
+    if(!SPELLS[g.spell]) continue;
+    if(g.type==="base") gBase[g.spell]+=v;
+    else if(g.type==="cdmg") ES[g.spell]+=v;
+    else if(g.type==="cchance") pS[g.spell]+=v;
+  }
+
+  // stance: só magias (runas ficam de fora) e só do elemento nativo dela
+  for(const k in SPELLS){
+    if(!sb.el || SPELLS[k].rune || SPELLS[k].el!==sb.el) continue;
+    if(sb.key==="base") gBase[k]+=sb.amount/100;
+    else if(sb.key==="cchance") pS[k]+=sb.amount/100;
+    else if(sb.key==="cdmg") ES[k]+=sb.amount/100;
+  }
+
+  const sens={fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)};
+
+  // elemento com que o dano chega no bicho
+  const dmgEl={};
+  for(const k in SPELLS) dmgEl[k]=(convert && sb.el && !SPELLS[k].rune) ? sb.el : SPELLS[k].el;
+
+  const freq={}, tg={}, powerEff={}; let weight=0;
+  for(const k in SPELLS){
+    freq[k]=Math.max(num("fq_"+k),0);
+    tg[k]=Math.max(num("tg_"+k),1);
+    powerEff[k]=SPELLS[k].power*(1+gBase[k])*((1+pS[k]*ES[k])/denBase)*((sens[dmgEl[k]]||100)/100);
+    weight+=freq[k]*tg[k]*powerEff[k];
+  }
+
+  const share={};
+  for(const k in SPELLS) share[k]= weight>0 ? (freq[k]*tg[k]*powerEff[k])/weight : 0;
+
+  // fatia por elemento nativo (perks da árvore) e por elemento de dano (pierce)
+  const el={fire:0,energy:0,death:0}, elDmg={fire:0,energy:0,death:0};
+  for(const k in SPELLS){ el[SPELLS[k].el]+=share[k]; elDmg[dmgEl[k]]+=share[k]; }
 
   let mult=0; for(const k in SPELLS) mult+=share[k]*SPELLS[k].mult;
   if(mult<=0) mult=10.5;
 
   const ml=Math.max(num("ml"),1), L=Math.max(num("level"),1);
-  const B=baseFromLevel(L);
+  const B=baseFromLevel(L)+Math.max(num("wdmg"),0)+gemDH;
+
   return {
-    L, ml, B, mult, share, el, tg,
+    L, ml, B, mult, share, el, elDmg, freq, tg, powerEff, pS, ES, sens, sb, gemDH,
+    p:pBase, E:EBase,
     procmode:document.getElementById("procmode").value,
     w:(mult*ml)/(mult*ml+B),
-    p:num("crit")/100, E:num("cdmg")/100,
-    bclass:num("bclass")/100,
-    sens:{fire:Math.max(num("sFire"),0),energy:Math.max(num("sEnergy"),0),death:Math.max(num("sDeath"),0)},
-    rotTotal:tot
+    bclass:num("bclass")/100
   };
 }
 
-// retorna ganho médio em % do dano total
+function scopeOf(o){
+  if(o.sp) return [o.sp];
+  if(o.el) return Object.keys(SPELLS).filter(k=>SPELLS[k].el===o.el);
+  return Object.keys(SPELLS);
+}
+
 function value(o,S){
-  const den=1+S.p*S.E;
-  const frac=o.el?S.el[o.el]:(o.sp?S.share[o.sp]:1);
   switch(o.t){
-    case "ml":      return o.n*S.w/S.ml*100*(o.el?S.el[o.el]:1);
-    case "skill":   return o.x*S.w;
-    case "critExtra":  return frac*S.p*o.y/den;
-    case "critChance": return frac*(o.x/100)*S.E/den*100;
-    case "base":    return o.z*frac;
-    case "bestiary":return o.v*S.bclass;
-    case "omega":   return o.v*0.30;
-    case "alpha":   return o.v*0.05;
-    case "boss":    return 0;
+    case "ml":         return o.n*S.w/S.ml*100*(o.el?S.el[o.el]:1);
+    case "skill":      return o.x*S.w;
+    case "critExtra":  return scopeOf(o).reduce((a,k)=>a+S.share[k]*S.pS[k]*o.y/(1+S.pS[k]*S.ES[k]),0);
+    case "critChance": return scopeOf(o).reduce((a,k)=>a+S.share[k]*(o.x/100)*S.ES[k]/(1+S.pS[k]*S.ES[k]),0)*100;
+    case "base":       return o.z*S.share[o.sp];
+    case "bestiary":   return o.v*S.bclass;
+    case "omega":      return o.v*0.30;
+    case "alpha":      return o.v*0.05;
+    case "boss":       return 0;
     case "pierce":{
       const Sv=S.sens[o.el];
       if(Sv<=0) return 0;
-      const add=Sv>100?o.v/2:o.v;
-      return S.el[o.el]*(add/Sv)*100;
+      return S.elDmg[o.el]*((Sv>100?o.v/2:o.v)/Sv)*100;
     }
     case "homing":{
-      // procs por cast: gasta uma rolagem por cast, independente de quantos alvos pegou.
-      // procs por alvo: uma rolagem por alvo atingido, o que anula o efeito do tamanho do pull.
-      // ganho = 0,03·Level · Σ(fatia_i / dano_por_cast_i), com dano_por_cast_i = alvos_i · (mult_i·ML + B)
-      let acc=0;
+      let rolls=0, dmg=0;
       for(const k in SPELLS){
-        if(!S.share[k]) continue;
-        const perTarget=SPELLS[k].mult*S.ml+S.B;
-        const perCast=perTarget*S.tg[k];
-        acc += S.share[k]/(S.procmode==="target"?perTarget:perCast);
+        if(!S.freq[k]) continue;
+        const d=SPELLS[k].mult*S.ml+S.B;
+        rolls += S.procmode==="target" ? S.freq[k]*S.tg[k] : S.freq[k];
+        dmg   += S.freq[k]*S.tg[k]*d;
       }
-      return 0.01*3*S.L*acc*100;
+      return dmg>0 ? (0.01*3*S.L*rolls/dmg)*100 : 0;
     }
     default: return 0;
   }
@@ -371,10 +475,10 @@ function value(o,S){
 
 function poolOptions(S){
   const main=Object.keys(SPELLS).reduce((a,b)=>S.share[a]>=S.share[b]?a:b);
-  const den=1+S.p*S.E;
+  const den=1+S.pS[main]*S.ES[main];
   return [
     {label:"+8% da maior skill de combate como dano extra nas magias", v:8*S.w, note:"neutro, pega toda a rotação"},
-    {label:"+20% crit extra damage — "+SPELLS[main].label, v:S.share[main]*S.p*20/den, note:"só na magia principal"},
+    {label:"+20% crit extra damage — "+SPELLS[main].label, v:S.share[main]*S.pS[main]*20/den, note:"só na magia principal"},
     {label:"+2,5% de dano contra a classe do bestiário", v:2.5*S.bclass, note:"só na fatia da spawn dessa classe"},
     {label:"+3% dano base — "+SPELLS[main].label, v:3*S.share[main], note:"só na magia principal"},
     {label:"+2,5% de dano contra alvos abaixo de 30% de vida", v:2.5*0.30, note:"média ao longo da kill"},
@@ -387,32 +491,57 @@ function poolOptions(S){
 let currentTree="coil";
 const fmt=v=>(v>=0?"+":"")+v.toFixed(2)+"%";
 
+function renderStance(S){
+  const sb=S.sb;
+  const rows=Object.entries(STANCE).map(([el,s])=>{
+    const on=sb.el===el;
+    const total=on?sb.amount:s.base+s.lod[sb.lod];
+    return `<div class="${el} ${on?"":"off"}">${on?"▸ ":"○ "}${el} — <b>+${total}%</b> ${s.stat} nas magias de ${el}
+      <span style="color:var(--ash)">(${s.base} da promoção + ${s.lod[sb.lod]} do Lord of Destruction Nv ${sb.lod})</span></div>`;
+  }).join("");
+  document.getElementById("stanceOut").innerHTML=
+    `<span class="l">${sb.el?"Ativa: "+sb.el:"Nenhuma stance ativa"}</span>${rows}`;
+}
+
 function render(){
   const S=readState();
-  const tree=TREES[currentTree];
-  const pool=poolOptions(S);
-  const best=pool[0];
+  renderStance(S);
+  document.getElementById("bTotal").textContent=S.B+(S.gemDH?"  (gemas +"+S.gemDH+")":"");
 
-  // melhor opção de cada nível
-  const per=tree.levels.map((opts,i)=>{
+  for(const k in SPELLS){
+    const pw=document.getElementById("pw_"+k);
+    const eff=S.powerEff[k], boosted=Math.abs(eff-SPELLS[k].power)>0.05;
+    pw.textContent=eff.toFixed(0);
+    pw.classList.toggle("boosted",boosted);
+    pw.title=boosted?`base ${SPELLS[k].power} → ${eff.toFixed(1)} com gemas, stance e sensibilidade`:`base ${SPELLS[k].power}, sem modificador`;
+
+    const st=document.getElementById("st_"+k);
+    const hasStance=S.sb.el && !SPELLS[k].rune && SPELLS[k].el===S.sb.el;
+    st.textContent=SPELLS[k].alias+(SPELLS[k].src?"":" · mult ~")+(hasStance?" · stance":"");
+    st.classList.toggle("st",!!hasStance);
+
+    const cell=document.getElementById("sh_"+k);
+    const pct=S.share[k]*100;
+    cell.textContent=pct.toFixed(1)+"%";
+    cell.classList.toggle("zero",pct<0.05);
+  }
+
+  const pool=poolOptions(S), best=pool[0];
+  const per=TREES[currentTree].levels.map((opts,i)=>{
     const vals=opts.map(o=>({o,v:value(o,S)}));
-    const top=vals.reduce((a,b)=>b.v>a.v?b:a);
-    return {i,vals,top};
+    return {i,vals,top:vals.reduce((a,b)=>b.v>a.v?b:a)};
   });
 
-  // dois níveis mais baratos = alvos de troca
   const order=[...per].sort((a,b)=>a.top.v-b.top.v);
   const shape=new Set([order[0].i,order[1].i]);
-  const lost=order[0].top.v+order[1].top.v;
-  const net=2*best.v-lost;
+  const net=2*best.v-(order[0].top.v+order[1].top.v);
 
   document.getElementById("oW").textContent=S.w.toFixed(3);
   document.getElementById("oB").textContent=S.B;
   document.getElementById("oSkill").textContent=fmt(8*S.w);
   document.getElementById("oNet").textContent=fmt(net);
 
-  const lad=document.getElementById("ladder");
-  lad.innerHTML=per.map(({i,vals,top})=>{
+  document.getElementById("ladder").innerHTML=per.map(({i,vals,top})=>{
     const isShape=shape.has(i);
     const rows=vals.map(({o,v})=>{
       const dead=o.t==="boss";
@@ -420,22 +549,18 @@ function render(){
         <div class="name">${o.label}${dead?"<small>situacional — vale 0 fora de boss</small>":""}</div>
         <div class="val">${fmt(v)}</div></div>`;
     }).join("");
-
-    const shapeBox=isShape?`<div class="shape-box">
+    const box=isShape?`<div class="shape-box">
         <div class="lead">Trocar este slot</div>
         ${pool.slice(0,3).map((q,k)=>`<div class="pool ${k===0?"top":""}">
-            <div class="name">${q.label}<small style="display:block;color:var(--ash);font-size:11.5px">${q.note}</small></div>
-            <div class="val">${fmt(q.v)}</div></div>`).join("")}
+          <div class="name">${q.label}<small style="display:block;color:var(--ash);font-size:11.5px">${q.note}</small></div>
+          <div class="val">${fmt(q.v)}</div></div>`).join("")}
         <div class="lost">Você abre mão de ${fmt(top.v)} para ganhar ${fmt(best.v)} — saldo ${fmt(best.v-top.v)}.</div>
       </div>`:"";
-
     return `<div class="rung ${isShape?"shape":""}" data-n="N${i+1}">
       <div class="head"><h3>${isShape?"Slot moldado":"Usar a melhor opção"}</h3>
         ${isShape?'<span class="badge" style="color:var(--sanguine);border-color:var(--sanguine-dim)">troca</span>':""}
         ${vals.length===1&&!isShape?'<span class="badge">nível fixo</span>':""}</div>
-      <div class="opts" ${isShape?'style="opacity:.45"':""}>${rows}</div>
-      ${shapeBox}
-    </div>`;
+      <div class="opts" ${isShape?'style="opacity:.45"':""}>${rows}</div>${box}</div>`;
   }).join("");
 }
 
@@ -443,35 +568,49 @@ function render(){
 
 function buildRotation(){
   document.getElementById("rot").innerHTML=Object.entries(SPELLS).map(([k,s])=>
-    `<div class="rot-row"><span>${s.label} <em>${s.el}${s.src?"":" ~"}</em></span>
-     <input type="number" id="rot_${k}" min="0" value="${DEFAULT_ROT[k]||0}" aria-label="% de dano de ${s.label}">
-     <input type="number" id="tg_${k}" min="1" value="${s.tg}" aria-label="alvos por cast de ${s.label}"></div>`).join("");
+    `<div class="rot-grid rot-row">
+      <div class="spell">${s.label}<em id="st_${k}">${s.alias}</em></div>
+      <input type="number" id="fq_${k}" min="0" value="${DEFAULT_FREQ[k]||0}" aria-label="% na rotação de ${s.label}">
+      <input type="number" id="tg_${k}" min="1" value="${s.tg}" aria-label="alvos por cast de ${s.label}">
+      <div class="out" id="pw_${k}">—</div>
+      <div class="out" id="sh_${k}">—</div>
+     </div>`).join("");
+}
+
+function renderGems(){
+  const box=document.getElementById("gems");
+  if(!GEMS.length){ box.innerHTML='<p class="hint" style="margin-top:0">Nada lançado ainda.</p>'; return; }
+  box.innerHTML=GEMS.map((g,i)=>`<div class="gem-row">
+    <select data-i="${i}" data-f="spell" ${g.type==="dh"?"disabled":""}>${Object.entries(SPELLS).map(([k,s])=>`<option value="${k}" ${g.spell===k?"selected":""}>${s.label}</option>`).join("")}</select>
+    <select data-i="${i}" data-f="type">${Object.entries(GEM_TYPES).map(([k,v])=>`<option value="${k}" ${g.type===k?"selected":""}>${v}</option>`).join("")}</select>
+    <input type="number" data-i="${i}" data-f="value" value="${g.value}" step="0.5" aria-label="valor">
+    <button type="button" class="x" data-del="${i}" aria-label="remover">×</button>
+  </div>`).join("");
 }
 
 function applyHunt(){
-  const r=document.getElementById("region").value;
-  const h=document.getElementById("hunt").value;
-  const d=REGIONS[r][h]; if(!d) return;
+  const d=REGIONS[document.getElementById("region").value][document.getElementById("hunt").value];
+  if(!d) return;
   document.getElementById("sFire").value=d.sens.fire;
   document.getElementById("sEnergy").value=d.sens.energy;
   document.getElementById("sDeath").value=d.sens.death;
-  for(const k in SPELLS) document.getElementById("rot_"+k).value=(d.rot&&d.rot[k])||0;
-  if(!d.rot) for(const k in DEFAULT_ROT) document.getElementById("rot_"+k).value=DEFAULT_ROT[k];
+  if(d.stance) document.getElementById("stance").value=d.stance;
+  const f=d.freq||DEFAULT_FREQ;
+  for(const k in SPELLS) document.getElementById("fq_"+k).value=f[k]||0;
 
   document.getElementById("huntmeta").innerHTML = d.verified
     ? `<span class="badge verified">área documentada</span>
        <div class="warn" style="background:#121A16;border-color:#2E4A3E;color:#BFD8CB">${d.note}<br>Os <b>valores</b> de sensibilidade são estimativa (fraco = 110). Ajuste pelo Bestiary.</div>`
     : `<span class="badge unverified">não verificado</span>
        <div class="warn">Não confirmei as resistências desta área. Os campos abaixo estão em 100% (neutro) — <b>abra o Bestiary de cada criatura e digite os valores reais</b>, senão a conta trata todos os elementos como iguais.</div>`;
-  render();
+  freqSum(); render();
 }
 
 function buildHunts(){
   const rs=document.getElementById("region");
   rs.innerHTML=Object.keys(REGIONS).map(r=>`<option>${r}</option>`).join("");
   const fill=()=>{
-    const r=rs.value;
-    document.getElementById("hunt").innerHTML=Object.keys(REGIONS[r]).map(h=>`<option>${h}</option>`).join("");
+    document.getElementById("hunt").innerHTML=Object.keys(REGIONS[rs.value]).map(h=>`<option>${h}</option>`).join("");
     applyHunt();
   };
   rs.addEventListener("change",fill);
@@ -479,23 +618,10 @@ function buildHunts(){
   fill();
 }
 
-function rotSum(){
-  let t=0; for(const k in SPELLS) t+=parseFloat(document.getElementById("rot_"+k).value)||0;
-  const el=document.getElementById("rotval");
-  el.textContent=t.toFixed(0)+"%";
+function freqSum(){
+  let t=0; for(const k in SPELLS) t+=parseFloat(document.getElementById("fq_"+k).value)||0;
+  document.getElementById("rotval").textContent=t.toFixed(0)+"%";
   document.getElementById("rotsum").classList.toggle("bad",Math.abs(t-100)>0.5);
-}
-
-function init(){
-  buildRotation();
-  buildHunts();
-  document.addEventListener("input",e=>{
-    if(e.target.tagName==="INPUT"){ rotSum(); render(); }
-  });
-  document.getElementById("procmode").addEventListener("change",render);
-  document.getElementById("tab-coil").addEventListener("click",()=>switchTab("coil"));
-  document.getElementById("tab-stellar").addEventListener("click",()=>switchTab("stellar"));
-  rotSum(); render();
 }
 
 function switchTab(t){
@@ -503,6 +629,40 @@ function switchTab(t){
   document.getElementById("tab-coil").setAttribute("aria-selected",t==="coil");
   document.getElementById("tab-stellar").setAttribute("aria-selected",t==="stellar");
   render();
+}
+
+function init(){
+  buildRotation();
+  renderGems();
+  buildHunts();
+
+  const gemEdit=t=>{
+    if(!t.dataset || t.dataset.f===undefined) return false;
+    GEMS[t.dataset.i][t.dataset.f]= t.dataset.f==="value" ? (parseFloat(t.value)||0) : t.value;
+    if(t.dataset.f==="type") renderGems();
+    render(); return true;
+  };
+  document.addEventListener("input",e=>{
+    if(gemEdit(e.target)) return;
+    if(e.target.tagName==="INPUT"){ freqSum(); render(); }
+  });
+  document.addEventListener("change",e=>{
+    if(gemEdit(e.target)) return;
+    if(["stance","qSE","procmode","convert"].includes(e.target.id)) render();
+  });
+  document.addEventListener("click",e=>{
+    const d=e.target.dataset ? e.target.dataset.del : undefined;
+    if(d!==undefined){ GEMS.splice(+d,1); renderGems(); render(); }
+  });
+
+  document.getElementById("addgem").addEventListener("click",()=>{
+    GEMS.push({spell:"gfw",type:"base",value:5});
+    renderGems(); render();
+  });
+
+  document.getElementById("tab-coil").addEventListener("click",()=>switchTab("coil"));
+  document.getElementById("tab-stellar").addEventListener("click",()=>switchTab("stellar"));
+  freqSum(); render();
 }
 
 init();
